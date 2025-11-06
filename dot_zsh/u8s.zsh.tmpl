@@ -1,0 +1,19 @@
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
+alias k="u8s kubectl --"
+alias kn="u8s set --namespace"
+alias kc="u8s set --context"
+alias kk="u8s set --kubeconfig"
+
+alias h="u8s helm --"
+alias h3="u8s helm3 --"
+
+alias ke="u8s kubectl -- exec -ti"
+alias kl="u8s kubectl -- logs -f"
+alias kg="u8s kubectl -- get"
+alias kgp="u8s kubectl -- get pods -o wide"
+alias kgpa="u8s kubectl -- get pods -o wide --all-namespaces"
+alias kgn="u8s kubectl -- get nodes -L container-linux-update.v1.coreos.com/version -L failure-domain.beta.kubernetes.io/zone"
+alias kdn="u8s kubectl -- describe node"
+alias kdp="u8s kubectl -- describe pod"
+alias kds="u8s kubectl -- describe service"
+{{- end }}

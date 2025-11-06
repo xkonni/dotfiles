@@ -1,0 +1,8 @@
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
+function cld {
+    exec {fd_ccloud}>>/dev/stdout
+    . =(ccloud-multitool --ppid $$ --stdout-fd $fd_ccloud "$@")
+    exec {fd_ccloud}>&-
+}
+source <(cld completion zsh --prog-name cld)
+{{- end }}

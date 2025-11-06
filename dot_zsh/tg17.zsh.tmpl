@@ -1,0 +1,28 @@
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
+# OS-CLIENT
+_urlencode() {
+  local length="${#1}"
+  for (( i = 0; i < length; i++ )); do
+    local c="${1:$i:1}"
+    case $c in
+      %) printf '%%%02X' "'$c" ;;
+      *) printf "%s" "$c" ;;
+    esac
+  done
+}
+
+osc7_cwd() {
+  printf '\e]7;file://%s%s\e\\' "$HOSTNAME" "$(_urlencode "$PWD")"
+}
+
+add-zsh-hook -Uz chpwd osc7_cwd
+
+# HAMMER
+export PYCCLOUD_SECRETS_REPO_PATH="~/workspace/openstack/secrets/"
+# export PYCCLOUD_KUBERNETES_CONFIG="~/.kube/config"
+export PYCCLOUD_KUBERNETES_CONFIG="~/Library/Application Support/SAPCC/u8s/.kube/config"
+export OS_PW_CMD="security find-generic-password -a openstack -w"
+
+# ALIASES
+alias os="os-client"
+{{- end }}

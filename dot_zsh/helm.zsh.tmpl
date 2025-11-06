@@ -1,0 +1,6 @@
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
+if type -p helm &> /dev/null
+then
+    source <(helm completion zsh)
+fi
+{{- end }}
