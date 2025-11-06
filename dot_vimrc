@@ -1,0 +1,57 @@
+set nocompatible            " be iMproved, required
+
+" fix e.g. listchars
+scriptencoding utf-8
+set encoding=utf-8
+
+" plug
+source ~/.vim/settings/plug.vim
+
+call tcomment#type#Define('c', '// %s')
+call tcomment#type#Define('cpp', '// %s')
+
+syntax on
+set list listchars=tab:\ \ ,trail:·
+
+set ignorecase
+set smartcase
+set colorcolumn=120
+set tw=100
+set cursorline
+set number
+set relativenumber
+set scrolloff=4
+set linebreak         " don't wrap in words
+
+set autoindent
+set smartindent
+set smarttab
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+set expandtab
+
+" colorscheme
+
+" map leader to a comma
+let mapleader=','
+
+" gui
+source ~/.vim/settings/appearance.vim
+source ~/.vim/settings/lightline.vim
+" functions
+source ~/.vim/settings/functions.vim
+" keymap
+source ~/.vim/settings/keymap.vim
+" plugin settings
+source ~/.vim/settings/ctrlp.vim
+source ~/.vim/settings/fzf.vim
+source ~/.vim/settings/indentLine.vim
+source ~/.vim/settings/deoplete.vim
+source ~/.vim/settings/vim-tmux-navigator.vim
+source ~/.vim/settings/vim-session.vim
+source ~/.vim/settings/neosnippet.vim
+source ~/.vim/settings/vimtex.vim
+source ~/.vim/settings/graphviz.vim
+source ~/.vim/settings/yankring.vim
+source ~/.vim/settings/robot.vim

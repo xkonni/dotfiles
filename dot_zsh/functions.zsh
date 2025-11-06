@@ -1,0 +1,238 @@
+# FUNCTIONS
+if [[ ${OS} == "Darwin" ]]
+then
+    function open() {
+      for i in $@; do
+        xdg-open $i &> /dev/null &
+      done
+    }
+fi
+
+function remod() {
+  sudo modprobe -r $* && \
+  sleep 1 && \
+  sudo modprobe $*
+}
+
+function isleep() {
+  if [ "$1" = "-h" ]; then
+    echo "call \"$0 TIME [STEPS]\""
+    return 0
+  fi
+  t_max=$1
+  t_stp=${2:-10}
+  echo "> sleeping ${t_max}s in ${t_stp}s steps"
+
+  t_nxt=$((t_stp))
+  t_rem=$t_max
+  while [ $t_nxt -le $t_max ]; do
+    echo -en "$t_rem "
+    sleep $t_stp
+    t_nxt=$((t_nxt + t_stp))
+    t_rem=$((t_rem - t_stp))
+  done
+  if [ $t_rem -gt 0 ]; then
+    echo -en "$t_rem "
+    sleep $t_rem
+  fi
+  echo -en "0\n"
+}
+
+# cd to dir of file
+function cdb() {
+  cd "$(dirname $1)"
+}
+
+function cpwd() {
+  pwd >! ~/.wd
+}
+
+function cpmk() {
+  if [ ${#@} -lt 2 ]; then
+    echo "not enough arguments. call with"
+    echo "  $0 file1 [file2, ...] target-dir"
+    return 1
+  fi
+  FILES=${@[1,#-1]}
+  DIR=${@[#]}
+  mkdir -p "$DIR"
+  for f in ${(s: :)FILES}; do
+    cp -v $f "$DIR"
+  done
+  unset FILES
+  unset DIR
+}
+
+function mvmk() {
+  if [ ${#@} -lt 2 ]; then
+    echo "not enough arguments. call with"
+    echo "  $0 file1 [file2, ...] target-dir"
+    return 1
+  fi
+  FILES=${@[1,#-1]}
+  DIR=${@[#]}
+  mkdir -p "$DIR"
+  for f in ${(s: :)FILES}; do
+    mv -v $f "$DIR"
+  done
+  unset FILES
+  unset DIR
+}
+
+function unzipd() {
+  DIR=$(pwd)
+  FILE=$(basename ${1})
+  unzip -d ${DIR}/${FILE%.zip} $1
+}
+function _escape() {
+  # echo $1 | sed 's/^\///;s/^\./dot_/;s/\/\./__dot_/;s/\//__/g'
+  echo $1 | sed "s,$HOME,HOME,;s,^\/,,;s,\/\.,__dot_,;s,\/,__,g"
+}
+
+function _unescape() {
+  # echo $1 | sed 's,dot_,'"$HOME/."',;s,^\([a-z]\),\/\1,;s,__,\/,g'
+  echo $1 | sed "s,HOME,$HOME,;s,^\([a-z]\),\/\1,;s,__dot_,\/\.,;s,__,\/,g"
+}
+
+function etcbackup() {
+  FILES=$*
+  if [ -z "$FILES" ]; then
+    echo "no file(s) specified"
+    return 1
+  fi
+  for FILE in ${(s: :)FILES}; do
+    if [ ! -f "$FILE" ]; then
+      echo "file \"$FILE\" does not exist"
+      continue
+    fi
+
+    TARGETDIR=$HOME/backup/$(hostname)
+    mkdir -p $TARGETDIR
+    SOURCEFILE=$(readlink -f $FILE)
+    TARGETFILE=$(_escape $SOURCEFILE)
+
+    cp -iv $FILE $TARGETDIR/$TARGETFILE
+
+    unset TARGETDIR
+    unset FILE
+    unset TARGETFILE
+  done
+}
+
+function etcrestore() {
+  FILES=$*
+  if [ -z "$FILES" ]; then
+    echo "no file(s) specified"
+    return 1
+  fi
+  for FILE in ${(s: :)FILES}; do
+    if [ ! -f "$FILE" ]; then
+      echo "file \"$FILE\" does not exist"
+      continue
+    fi
+
+    BASENAME=$(basename $FILE)
+    TARGETFILE=$(_unescape $BASENAME)
+    TARGETDIR=$(dirname $TARGETFILE)
+
+    SUDO=""
+    if [[ ! $TARGETFILE = *"${HOME}"* ]]; then
+      echo "need root privileges..."
+      SUDO=sudo
+    fi
+    $SUDO mkdir -p $TARGETDIR
+    $SUDO cp -iv $FILE $TARGETFILE
+
+    unset FILE
+    unset TARGETDIR
+    unset TARGETFILE
+    unset BASENAME
+  done
+}
+
+function lsmnt() {
+  echo "Mounted devices:"
+  mount | grep -E '(//|:|/dev/disk|/dev/mapper|/dev/md|/dev/mmc|/dev/nvme|/dev/sd|\.img|\.iso)' | sort -h |
+    while read tmp; do
+      MDEV=${tmp% on *}
+      tmp=${tmp#$MDEV on }
+      MDIR=${tmp% type *}
+      tmp=${tmp#$MDIR type }
+      MTYPE=${tmp% *}
+      if [ ${#MDEV} -gt 40 ]; then
+        if [ ${#MDEV:t} -gt 30 ]; then
+          MDEV_T="…${${MDEV:t}[-29,-1]}"
+        else
+          MDEV_T=${MDEV:t}
+        fi
+        MDEV="${${${${(@j:/:M)${(@s:/:)MDEV}##.#?}:h}%/}//\%/%%}/${MDEV_T}"
+      fi
+      printf "    %-40s %9s -> %-12s\n" $MDEV "($MTYPE)" $MDIR
+    done
+  unset MDEV MDIR MTYPE IGN
+}
+
+function ppwd() {
+  [ -e ~/.wd ] && cd "$(cat ~/.wd)"
+}
+
+function epwd() {
+  [ -e ~/.wd ] && cat ~/.wd
+}
+
+function cp2wd() {
+  if [ -e ~/.wd ];
+  then
+    cp "$@" $(cat ~/.wd)
+  fi
+}
+
+function mv2wd() {
+  if [ -e ~/.wd ];
+  then
+    mv "$@" $(cat ~/.wd)
+  fi
+}
+
+function now() {
+  date +%Y${1}%m${1}%d${2:-_}%H${1}%M
+}
+
+function nows() {
+  date +%Y${1}%m${1}%d${2:-_}%H${1}%M${1}%S
+}
+
+function today() {
+  date +%Y${1}%m${1}%d
+}
+
+function x2bin() { perl -e "printf(\"0b%b\n\",  $1)" }
+function x2dec() { perl -e "printf(\"%d\n\",    $1)" }
+function x2hex() { perl -e "printf(\"0x%x\n\",  $1)" }
+
+function sshproxy() {
+  HOST=${1:-ykonni}
+  PORT=${2:-8222}
+  echo "starting proxy to $HOST on $PORT"
+  while true; do
+    # probe if host is up
+    ssh $HOST true &> /dev/null
+    if [ $? -eq 0 ]; then
+      echo connected.
+      ssh -o ConnectTimeout=3 -o LocalCommand="echo foo" -q -N -D $PORT $HOST
+    fi
+    echo "disconnected. retrying in 10"
+    for i in $(seq 10); do
+      echo -en "."
+      sleep 1
+    done
+    echo ""
+  done
+}
+
+function printcolors() {
+  for i in {0..255}
+  do
+    print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}
+  done
+}
