@@ -1,5 +1,5 @@
+# vim: ft=zsh
 # zsh general
-# alias zr="source ~/.zshrc"
 alias zr="znap restart"
 alias cm="chezmoi"
 
@@ -84,14 +84,13 @@ alias SL='ssh-add -l'
 alias SE='eval $(keychain --eval)'
 
 # CLIPBOARD
-if [[ ${OS} == "Darwin" ]]
-then
-    alias -g CP='| pbcopy'
-    alias PS='pbpaste'
-else
-    alias -g CP='| wl-copy'
-    alias PS='wl-paste'
-fi
+{{ if eq .chezmoi.os "darwin" -}}
+alias -g CP='| pbcopy'
+alias PS='pbpaste'
+{{ else if eq .chezmoi.os "linux" -}}
+alias -g CP='| wl-copy'
+alias PS='wl-paste'
+{{ end -}}
 function CPF() {
     cat $1 CP
 }

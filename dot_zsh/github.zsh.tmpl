@@ -1,3 +1,5 @@
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
+# vim: ft=zsh
 # GitHub classic API tokens
 # - [x] repo
 # - [x] admin:org
@@ -5,3 +7,4 @@
 export GITHUB_API_TOKEN_COM={{ .github_api_token_com }}
 export GITHUB_API_TOKEN_WDF={{ .github_api_token_wdf }}
 export GITHUB_API_TOKEN_TOOLS={{ .github_api_token_tools }}
+{{- end }}
