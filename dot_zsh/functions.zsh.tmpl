@@ -1,3 +1,4 @@
+# vim: ft=zsh
 # FUNCTIONS
 if [[ ${OS} == "Darwin" ]]
 then
@@ -270,38 +271,3 @@ function wnping() {
     done
     [ $COUNT -gt 0 ] && echo ""
 }
-
-{{- if eq .chezmoi.os "linux" -}}
-function mzip() {
-  TARGET=/home/konni
-  if [ -n "$2" ];
-  then
-    TARGET="$HOME/Cloud/xkonni/share/$2"
-    # mkdir -p "$TARGET"
-  fi
-  if [ ! -e "$1" ];
-  then
-    echo "target \"$1\" does not exist"
-    return 1
-  fi
-
-  NAME=$(echo $1 | sed 's/\//-/g;s/ /_/g;s/\&/and/g;s/\[//g;s/\]//g;s/{//g;s/}//g')
-  echo "compressing \"$1\" to \"${TARGET}/${NAME}.zip\""
-  zip -r "${TARGET}/${NAME}.zip" "$1"
-}
-
-function publish() {
-  URLBASE=dump
-  [ -f "$1" ] || return
-  TARGET="$(basename $1 | sed 's/\ /_/g;s/(//;s/)//g')"
-  URL="https://xkonni.de/${URLBASE}/${TARGET}"
-  echo $URL
-  [ -e /usr/bin/xsel ] && echo $URL | xsel -pi 2> /dev/null
-  scp "$1" "xkonni:${URLBASE}/${TARGET}"
-  ssh xkonni chmod o+r "${URLBASE}/${TARGET}"
-  # cleanup
-  unset URLBASE
-  unset URL
-  unset TARGET
-}
-{{- end }}
