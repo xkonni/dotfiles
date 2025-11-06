@@ -42,8 +42,6 @@ then
     help() {
         "$@" --help 2>&1 | $cat --plain --language=help
     }
-else
-    echo no bat
 fi
 
 
