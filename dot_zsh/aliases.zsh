@@ -1,6 +1,7 @@
 # zsh general
 # alias zr="source ~/.zshrc"
 alias zr="znap restart"
+alias cm="chezmoi"
 
 # These aliases enable us to paste example code into the terminal without the
 # shell complaining about the pasted prompt symbol.

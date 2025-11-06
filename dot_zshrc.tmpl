@@ -65,10 +65,12 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 
-if [[ $(uname) == "Darwin" ]] && type brew &> /dev/null
-then
-    eval $(brew shellenv)
-fi
+{{ if eq .chezmoi.os "darwin" -}}
+export OS=Darwin
+eval $(brew shellenv)
+{{ else if eq .chezmoi.os "linux" -}}
+export OS=Linux
+{{ end -}}
 
 autoload -U compinit && compinit
 

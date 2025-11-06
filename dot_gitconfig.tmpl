@@ -145,6 +145,10 @@
     lw   = whatchanged -n 1
     w   = whatchanged -n 10
 
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" }}
+    rv = !git push origin +$(git rev-parse --abbrev-ref HEAD)
+{{- end }}
+
 [format]
     pretty = format:%C(33)%ad%Creset %C(136)%h%C(70)%d%Creset %C(33)%s %C(162) [%an]%Creset
 
@@ -194,8 +198,8 @@
     enabled = true
 
 [user]
-    email = konstantin.koslowski@posteo.de
-    name = Konstantin Koslowski
+    email = {{ .email | quote }}
+    name = {{ .name }}
 
 [credential]
     helper = cache --timeout 3600
