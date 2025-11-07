@@ -6,7 +6,7 @@ fi
 # Set up fzf key bindings and fuzzy completion
 if type -f fzf &> /dev/null
 then
-    source <(fzf --zsh)
+    source <(fzf --zsh 2> /dev/null)
 
     # fzf-tab
     # disable sort when completing `git checkout`

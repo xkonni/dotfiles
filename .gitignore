@@ -1,4 +1,7 @@
-yankring_history_v2.txt
-*.pyc
+.DS_Store
 dot_git
 dot_vim/plugged/*
+dot_vim/autoload
+yankring_history_v2.txt
+*.pyc
+*.swp
