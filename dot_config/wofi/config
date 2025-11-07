@@ -1,0 +1,15 @@
+allow_images=true
+allow_markup=true
+image_size=24
+# this only works in the config file for now
+# drun-print_command=true
+# sort_order=alphabetical
+location=2
+term=foot
+width=800
+lines=10
+# DMENU
+# If true the result returned by dmenu will be stripped of image escape sequences and pango markup, default is false.
+dmenu-parse_action=true
+# The character used to separate dmenu entries, default is \n.
+# dmenu-separator=,
