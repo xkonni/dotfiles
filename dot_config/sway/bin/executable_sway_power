@@ -1,0 +1,58 @@
+#!/bin/bash
+source $HOME/.config/sway/bin/sway_helpers
+BAT_PATH=/sys/class/power_supply
+BAT=BAT0
+MEDIA_APP=playerctl
+INHIBIT_FILE=$HOME/.inhibit_suspend
+
+## helpers
+# 1: discharging
+# 0: charging/full
+function _state() {
+  f=$BAT_PATH/$BAT/status
+  # default to discharging when status file not found
+  s=1
+  if [ -e $f ]; then
+    s=$(grep -c Discharging $f)
+  fi
+  echo $s
+}
+
+function _suspend() {
+  _check_inhibit $INHIBIT_FILE
+  state=$(_state)
+  force=${1:-0}
+  mode=${2:-suspend-then-hibernate}
+  if [ $state -eq 1 -o $force -eq 1 ]; then
+    _log SUSPEND INFO starting. state: $state, force: $force, mode: $mode
+    $MEDIA_APP stop
+    systemctl $mode
+  else
+    _log SUSPEND INFO aborting. state: $state, force: $force, mode: $mode
+  fi
+}
+
+## main
+_log SUSPEND INFO args: $*
+
+case $1 in
+  i*)
+    _set_inhibit $INHIBIT_FILE $2
+    ;;
+  suspend-battery)
+    _suspend 0 suspend-then-hibernate
+    ;;
+  suspend)
+    _suspend 1 suspend
+    ;;
+  suspend-hib)
+    _suspend 1 suspend-then-hibernate
+    ;;
+  poweroff)
+    systemctl poweroff
+    ;;
+  *)
+    echo "invalid argument: \"$1\""
+    echo "arguments: [inhibit [on|off]|suspend-battery|suspend-only|suspend|poweroff]"
+    ;;
+esac

@@ -1,0 +1,10 @@
+X[Unit]
+Description=Nextcloud Desktop
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/nextcloud --background
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

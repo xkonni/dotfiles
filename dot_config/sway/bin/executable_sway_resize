@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#
+# inspired by sway_move from bob hepple
+#
+
+initialise() {
+    PROG=$(basename $0)
+    VERSION="1.0"
+    ARGUMENTS="top-right|bottom-right|bottom-left"
+    USAGE="move a floating window to the edges because sway lacks a way to do it!"
+
+    case $1 in
+        -h|--help)
+            echo "$USAGE"
+            exit 0
+            ;;
+        1*|2*|3*|4*|5*|6*|7*|8*|9*)
+            command="$1"
+            ;;
+        *)
+            echo "$PROG: bad argument" >&2
+            exit 1
+            ;;
+    esac
+
+    return 0
+}
+
+initialise "$@"
+# win_dim=( $( swaymsg -t get_tree |
+#     jq '.. | select(.type?) | select(.type=="floating_con") | select(.focused?)|.rect.width, .rect.height, .deco_rect.height' ) )
+
+type=$( swaymsg -t get_tree | jq '.. | select(.focused?)|.type' | sed 's/"//g')
+
+case "$type" in
+    "con")
+        if [ $1 -ge 10 -a $1 -le 90 ]
+        then
+            width=${1}ppt
+            echo swaymsg "resize set width ${width}"
+            swaymsg "resize set width ${width}"
+        else
+            echo "invalid width $1"
+        fi
+        ;;
+    "floating_con")
+        width=$((${1} * 21))
+        height=$((${width} * 9 / 16))
+        echo swaymsg "resize set width ${width}px height ${height}px"
+        swaymsg "resize set width ${width} height ${height}"
+        ;;
+    *)
+        echo wrong type $type
+        ;;
+esac
