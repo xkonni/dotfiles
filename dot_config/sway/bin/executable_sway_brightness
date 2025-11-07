@@ -1,0 +1,40 @@
+#!/bin/bash
+source $HOME/.config/sway/bin/sway_helpers
+DEVICE=sysfs/backlight/intel_backlight
+NOTIFY_APP="dunstify -a brightness -h string:x-dunst-stack-tag:brightness"
+ICON=$HOME/.local/share/icons/Tela-circle-dark/16/panel/xfpm-brightness-lcd.svg
+APP="/usr/bin/brightnessctl"
+APP_INC="$APP s 10%+"
+APP_DEC="$APP s 10%-"
+PRG1="●"
+PRG2="◌"
+
+function _get_br() {
+    $APP | grep -oE '[0-9]*%' | sed 's/%//g'
+}
+
+## main
+_log BRIGHTNESS INFO args: $*
+_check_app $APP
+
+case $1 in
+  d*)
+    $APP_DEC &> /dev/null
+    BR=$(_get_br)
+    echo $BR
+    $NOTIFY_APP -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
+    ;;
+  i*)
+    $APP_INC &> /dev/null
+    BR=$(_get_br)
+    echo $BR
+    $NOTIFY_APP -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
+    ;;
+  "-h"|"--help")
+    echo "arguments: [decrease|increase]"
+    ;;
+  *)
+    BR=$($APP_BR)
+    $NOTIFY_APP -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
+    ;;
+esac

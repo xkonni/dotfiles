@@ -1,0 +1,114 @@
+#!/bin/bash
+source $HOME/.config/sway/bin/sway_helpers
+LOCK_IMAGE=$HOME/.config/sway/bin/lock.png
+MEDIA_APP=playerctl
+SCROT_APP=grim
+SCROT_APP_ARGS=" -t png -l 0"
+SCROT_FILE_BASE=$HOME/.lockscreen
+SCROT_FILE_EXT=png
+LOCK_APP=swaylock
+# LOCK_ARGS=" -f -F -e -s fill -c 000000 --indicator-radius 100 --indicator-thickness 20"
+LOCK_ARGS=" -F -e -s fill -c 000000 --indicator-radius 100 --indicator-thickness 20"
+INHIBIT_FILE=$HOME/.inhibit_lock
+
+CONVERT=convert
+if which magick
+then
+    CONVERT="magick convert"
+fi
+
+function _clean() {
+  for output in $(_outputs); do
+    SCROT_FILE=${SCROT_FILE_BASE}_${output}.${SCROT_FILE_EXT}
+    rm -vf $SCROT_FILE
+  done
+}
+
+function _lock() {
+  _check_inhibit $INHIBIT_FILE
+  $MEDIA_APP pause
+  _check_running $LOCK_APP
+  for output in $(_outputs); do
+    SCROT_FILE=${SCROT_FILE_BASE}_${output}.${SCROT_FILE_EXT}
+    LOCK_ARGS+=" -i ${output}:$SCROT_FILE"
+  done
+  $LOCK_APP $LOCK_ARGS
+}
+
+function _off() {
+  swaymsg "output * dpms off"
+}
+
+function _on() {
+  swaymsg "output * dpms on"
+}
+
+function _outputs() {
+  swaymsg -t get_outputs | jq '.[] |select(.active == true) | .name' | while read line; do
+    echo ${line//\"/}
+  done
+}
+
+function _screenshot() {
+  for output in $(_outputs); do
+    SCROT_FILE=${SCROT_FILE_BASE}_${output}.${SCROT_FILE_EXT}
+    echo $SCROT_FILE
+    $SCROT_APP $SCROT_APP_ARGS -o $output $SCROT_FILE
+    # convert -blur 0x5 $SCROT_FILE $SCROT_FILE
+    # convert -motion-blur 15x15 $SCROT_FILE $SCROT_FILE
+    $CONVERT -scale 20% -blur 2x2 -resize 500% $SCROT_FILE $SCROT_FILE
+    $CONVERT -composite -gravity center $SCROT_FILE $LOCK_IMAGE $SCROT_FILE
+  done
+}
+
+## main
+_log LOCK INFO args: $*
+_check_app $LOCK_APP
+_check_app $SCROT_APP
+_check_app $MEDIA_APP
+
+case "$1" in
+  i*)
+    _set_inhibit $INHIBIT_FILE $2
+    ;;
+  clean)
+    _clean
+    ;;
+  lock)
+    _on
+    _screenshot
+    _lock
+    _clean
+    ;;
+  lockonly)
+    _lock
+    _clean
+    ;;
+  off)
+    _screenshot
+    _off
+    ;;
+  on)
+    _on
+    _clean
+    ;;
+  screensaver)
+    _screenshot
+    swayidle -w \
+      timeout 5 'swaymsg "output * dpms off"' \
+      resume 'swaymsg "output * dpms on"' &
+    PID=$!
+    _lock
+    _clean
+    kill $PID
+    ;;
+  screenshot)
+    _on
+    _screenshot
+    ;;
+  *)
+    echo "invalid argument \"$1\""
+    echo "arguments: [inhibit [on|off]|lock|lockonly|off|on|screensaver|screenshot]"
+esac
+
+

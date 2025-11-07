@@ -1,0 +1,80 @@
+@define-color background rgba(20, 20, 20, 0.8);
+@define-color foreground #ebdbb2;
+@define-color black      #222222;
+@define-color yellow     #fabd2f;
+@define-color red        #fb4934;
+@define-color green      #b8bb26;
+@define-color blue       #268bd2;
+
+* {
+  border: none;
+  border-radius: 0;
+  font-family: "Cascadia Code PL", "Material Icons";
+  font-size: 13.5px;
+  min-height: 0;
+}
+
+window#waybar {
+  background: @background;
+  color: @foreground;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+}
+
+#workspaces button {
+  padding: 0 10px;
+  min-width: 60px;
+  background: transparent;
+  color: @foreground;
+  border-bottom: 3px solid transparent;
+}
+
+#workspaces button.focused {
+  color: @blue;
+  border-bottom: 3px solid @blue;
+}
+
+#workspaces button.urgent {
+  border-bottom: 3px solid @yellow;
+}
+
+/* normal */
+#backlight,
+#battery,
+#clock,
+#cpu,
+#custom-media,
+#memory,
+#pulseaudio,
+#workspaces {
+  padding: 0 6px;
+  margin: 0 6px;
+}
+#network {
+  padding: 0 2px;
+  margin: 0 2px;
+}
+
+/* good */
+#battery.full {
+  border-bottom: 3px solid @green;
+}
+
+/* focus */
+#battery.charging {
+  border-bottom: 3px solid @blue;
+}
+
+/* warning */
+#battery.warning,
+#cpu.warning,
+#memory.warning {
+  border-bottom: 3px solid @yellow;
+}
+
+/* critical */
+#battery.critical,
+#cpu.critical,
+#memory.critical {
+  border-bottom: 3px solid @red;
+}

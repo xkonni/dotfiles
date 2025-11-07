@@ -1,0 +1,117 @@
+#!/bin/bash
+source $HOME/.config/sway/bin/sway_helpers
+ICON_PATH=$HOME/.local/share/icons/Tela-circle-dark/16/actions
+NOTIFY_APP="dunstify -a volume -h string:x-dunst-stack-tag:volume"
+APP="pavucontrol"
+SOUND=$HOME/.config/sway/bin/audio-volume-change.oga
+
+# echo -e '\u25cf'
+VOL1="●"
+# echo -e '\u25cc'
+VOL2="◌"
+
+function _get_default_sink() {
+  pactl info | grep "Default Sink" | cut -d ' ' -f 3
+}
+
+function _get_sink_desc() {
+    pactl -f json list sinks | jq -c ".[] | select(.name | contains(\"$1\")) | .description" | sed 's/"//g'
+}
+
+function notify() {
+  SINK=$(_get_default_sink)
+  SINK_VOLUME=$(pactl list sinks | grep "Name: $SINK" -A 8 | grep -oE '[0-9]*%' | head -n 1 | sed 's/%//')
+  SOURCE_VOLUME=$(pactl list sources | grep "Name: $SOURCE" -A 8 | grep -oE '[0-9]*%' | head -n 1 | sed 's/%//')
+  MUTE=$(pactl list sinks | grep "Name: $SINK" -A 8 | grep 'Mute:' | cut -d " " -f 2)
+  SOURCE_MUTE=$(pactl list sources | grep "Name: $SOURCE" -A 8 | grep 'Mute:' | cut -d " " -f 2)
+  DESC=$(_get_sink_desc $SINK)
+
+  ICON=$ICON_PATH/audio-volume-high.svg
+  SINK_ICON=""
+  if [ "$MUTE" = "yes" ]; then
+    ICON=$ICON_PATH/audio-volume-muted.svg
+  elif [ $SINK_VOLUME -le 33 ]; then
+    ICON=$ICON_PATH/audio-volume-low.svg
+    SINK_ICON=""
+  elif [ $SINK_VOLUME -le 67 ]; then
+    ICON=$ICON_PATH/audio-volume-medium.svg
+    SINK_ICON=""
+  fi
+  SOURCE_ICON=""
+  if [ "$SOURCE_MUTE" = "yes" ]; then
+    SOURCE_ICON=""
+  fi
+  TITLE="${SINK_ICON} ${SINK_VOLUME}% / ${SOURCE_ICON} ${SOURCE_VOLUME}%"
+  # $NOTIFY_APP -i $ICON -a "Volume" "$TEXT"
+  $NOTIFY_APP -i $ICON "$TITLE" "$DESC\n$(getProgressString 10 "$VOL1" "$VOL2" $SINK_VOLUME)"
+}
+
+function _toggle_sink() {
+    sink_next=$(pactl list sinks | grep node\.name | grep -oE '"[a-zA-Z0-9_.-]*"' | grep -v $1 | sed 's/"//g' | sort -R | head -n 1)
+  echo "$sink_next"
+  pactl set-default-sink $sink_next
+}
+
+##  helpers
+function _toggle_app() {
+  a=$1
+  if [ $(pgrep $a) ]; then
+    killall $a
+  else
+    $a &> /dev/null &
+  fi
+}
+
+## main
+SINK=$(pactl info | grep "Default Sink" | cut -d ' ' -f 3)
+SOURCE=$(pactl info | grep "Default Source" | cut -d ' ' -f 3)
+if [ -z "$SINK" ]; then
+  _log VOLUME ERROR args: $*
+  exit 1
+fi
+
+case $1 in
+  # decrease
+  d*)
+    pactl set-sink-volume $SINK -5%
+    paplay $SOUND &
+    notify
+    ;;
+  # increase
+  i*)
+    VOLUME=$(pactl list sinks | grep "Name: $SINK" -A 8 | grep -oE '[0-9]*%' | head -n 1 | sed 's/%//')
+    INC=$((100 - $VOLUME))
+    if [ $INC -gt 5 ]; then
+      INC=5
+    fi
+    pactl set-sink-volume $SINK +${INC}%
+    paplay $SOUND &
+    notify
+    ;;
+  # mute
+  m*)
+    pactl set-sink-mute $SINK toggle
+    paplay $SOUND &
+    notify
+    ;;
+  # source-mute
+  s*)
+    pactl set-source-mute $SOURCE toggle
+    paplay $SOUND &
+    notify
+    ;;
+  # toggle between sinks
+  t*)
+    _toggle_sink $SINK
+    notify
+  ;;
+  # show gui
+  g*)
+    _check_app $APP
+    _toggle_app $APP
+    ;;
+  *)
+    echo "invalid command: \"$1\""
+    echo "arguments: [decrease|increase|mute|gui]"
+    ;;
+esac
