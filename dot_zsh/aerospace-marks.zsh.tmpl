@@ -75,7 +75,7 @@ _aerospace-marks()
         local suffix
         (( suffix=${#lastLine}+2))
         out=${out[1,-$suffix]}
-    else
+    Else
         # There is no directive specified.  Leave $out as is.
         __aerospace-marks_debug "No directive found.  Setting do default"
         directive=0

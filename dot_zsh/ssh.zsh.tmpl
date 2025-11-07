@@ -1,0 +1,94 @@
+# vim: ft=zsh
+SSH_AUTH_SOCK_FILE=~/.ssh/SSH_AUTH_SOCK
+LOGDIRS=(/run/user/$(id -u) /var/tmp/)
+LOGFILE=ssh_auth_sock.log
+
+function _log() {
+  for logdir in "${LOGDIRS[@]}"; do
+    if [[ -d "$logdir" ]]; then
+      echo $* >>$logdir/$LOGFILE
+      return
+    fi
+  done
+}
+
+# Save SSH_AUTH_SOCK to file and set environment
+function ssh_save() {
+  # file exists
+  if [ -e "$SSH_AUTH_SOCK_FILE" ]; then
+    # current env different from file
+    if [ ! "$SSH_AUTH_SOCK" = "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
+      # existing socket in file invalid
+      if [ ! -e "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
+        save_file
+      fi
+    fi
+  # file missing
+  else
+    save_file
+  fi
+  set_env
+}
+
+# Load SSH_AUTH_SOCK from file
+function ssh_load() {
+  if [ -e $SSH_AUTH_SOCK_FILE ]; then
+    SSH_AUTH_SOCK=$(cat $SSH_AUTH_SOCK_FILE)
+    if [ -e "$SSH_AUTH_SOCK" ]; then
+      export SSH_AUTH_SOCK
+      if [ -n "$SSH_CLIENT" ]; then
+        _log "loaded SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+      fi
+    else
+      _log "ERROR: invalid socket: $SSH_AUTH_SOCK"
+    fi
+  else
+    agent_ssh_socket=$(gpgconf -L | grep agent-ssh-socket)
+    if [ -n "$agent_ssh_socket" ]; then
+      SSH_AUTH_SOCK=$(echo $agent_ssh_socket | cut -d ":" -f 2)
+      export SSH_AUTH_SOCK
+      _log "using gpgconf SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+      return 0
+    fi
+    _log "ERROR: missing file \"$SSH_AUTH_SOCK_FILE\""
+  fi
+  set_env
+}
+
+function set_env() {
+  if [ -n "$SSH_AUTH_SOCK" ]; then
+    {{ if eq .chezmoi.os "darwin" -}}
+    launchctl setenv SSH_AUTH_SOCK $SSH_AUTH_SOCK
+    {{- else if eq .chezmoi.os "linux" -}}
+    grep -q init.scope /proc/1/cgroup && systemctl --user set-environment SSH_AUTH_SOCK=${SSH_AUTH_SOCK}
+    {{- end }}
+  fi
+}
+
+function save_file() {
+  _log "saving SSH_AUTH_SOCK: $SSH_AUTH_SOCK to file: $SSH_AUTH_SOCK_FILE"
+  echo $SSH_AUTH_SOCK >$SSH_AUTH_SOCK_FILE
+}
+
+function ssh_find() {
+  local SSH_AUTH_SOCK_BASE="/tmp/ssh-"
+  local SSH_AUTH_SOCK_TMP=$(ls ${SSH_AUTH_SOCK_BASE}*/agent*(om[1]))
+  if [ -n "$SSH_AUTH_SOCK_TMP" ]; then
+    export SSH_AUTH_SOCK=$SSH_AUTH_SOCK_TMP
+    ssh_save
+  fi
+}
+
+alias sl='ssh-add -l'
+alias sas="ssh_save"
+alias sal="ssh_load"
+
+{{ if eq .chezmoi.os "darwin" -}}
+eval $(keychain --eval 2>/dev/null)
+{{ else if eq .chezmoi.os "linux" -}}
+if [ -n "$SSH_AUTH_SOCK" -a -e $SSH_AUTH_SOCK ]; then
+  ssh_save
+else
+  ssh_load
+fi
+{{ end -}}
