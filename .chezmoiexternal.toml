@@ -32,3 +32,48 @@
 [".vim/autoload/plug.vim"]
     type = "file"
     url = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+    refreshPeriod = "168h"
+{{- $fontDir := ".local/share/fonts" }}
+{{- if eq .chezmoi.os "darwin" }}
+{{-   $fontDir = "Library/Fonts" }}
+{{- end }}
+["{{ $fontDir }}/CaskaydiaCove Bold.ttf"]
+    type = "file"
+    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Bold.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/CaskaydiaCove ExtraLight.ttf"]
+    type = "file"
+    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-ExtraLight.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/CaskaydiaCove Light.ttf"]
+    type = "file"
+    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Light.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/CaskaydiaCove Medium.ttf"]
+    type = "file"
+    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Medium.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/CaskaydiaCove Regular.ttf"]
+    type = "file"
+    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Regular.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/CaskaydiaCove SemiBold.ttf"]
+    type = "file"
+    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-SemiBold.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/MesloLGS NF Regular.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Regular.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/MesloLGS NF Bold.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Bold.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/MesloLGS NF Italic.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Italic.ttf"
+    refreshPeriod = "168h"
+["{{ $fontDir }}/MesloLGS NF Bold Italic.ttf"]
+    type = "file"
+    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Bold Italic.ttf"
+    refreshPeriod = "168h"
