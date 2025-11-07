@@ -1,3 +1,4 @@
+# vim: ft=zsh
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -90,38 +91,20 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
+paths=(/usr/local/go/bin $HOME/bin $HOME/.local/bin $HOME/go/bin)
+for p in ${paths[@]}
+do
+    if [ -d $p ]
+    then
+        if [[ ! $PATH =~ $p ]]
+        then
+            export PATH=$p:$PATH
+        fi
+    fi
+done
 
 if [ -d ~/.zsh ]; then
   for i in ~/.zsh/*.zsh; do
-    source $i
-  done
-fi
-
-if [ -d ~/.zsh_extra ]; then
-  for i in ~/.zsh_extra/*.zsh; do
     source $i
   done
 fi
