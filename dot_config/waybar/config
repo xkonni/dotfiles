@@ -61,15 +61,15 @@
     "format-icons": {
       "chromium": " ",
       "firefox": " ",
-      "Plexamp": "♫ ",
+      "Plexamp": "󰚺 ",
       "default": "♪ "
     },
     "escape": true,
     "exec": "$HOME/.config/sway/bin/waybar_mediaplayer.py"
   },
   "clock": {
-      "format": "<span foreground='#ebdbb2'> </span>{:%H:%M, %b %d }",
-      "format-alt": "<span foreground='#ebdbb2'> </span>{:%A, %B %d, %Y (%R)}",
+      "format": "<span foreground='#ebdbb2'> </span>{:%H:%M, %b %d }",
+      "format-alt": "<span foreground='#ebdbb2'> </span>{:%A, %B %d, %Y (%R)}",
       "tooltip-format": "\n<span size='9pt'>{calendar}</span>",
       "calendar": {
           "mode"          : "year",
@@ -101,7 +101,7 @@
       "warning": 70,
       "critical": 90
     },
-    "on-click": "foot -T float bashtop"
+    "on-click": "foot -T float btop"
   },
   "memory": {
     "format": "<span foreground='#ebdbb2'></span>{}%",
@@ -111,7 +111,7 @@
       "warning": 70,
       "critical": 90
     },
-    "on-click": "foot -T float bashtop"
+    "on-click": "foot -T float btop"
   },
   "battery": {
     "bat": "BAT0",
@@ -146,20 +146,21 @@
     "on-click": "foot -T float nmtui"
   },
   "pulseaudio": {
-    "format": "<span foreground='#ebdbb2'>{icon} </span>{volume}% {format_source}",
-    "format-muted": "<span foreground='#fb4934'> </span>{format_source}",
+    "format": "<span foreground='#ebdbb2'>{icon} {volume}% </span>{format_source}",
+    "format-muted": "<span foreground='#fb4934'> {volume}% </span>{format_source}",
     "format-bluetooth": "<span foreground='#ebdbb2'>{icon}</span> {volume}% {format_source}",
     "format-bluetooth-muted": "<span foreground='#fb4934'>{icon}</span>{format_source}",
     "format-source": "<span foreground='#b8bb26'></span>",
     "format-source-muted": "<span foreground='#fb4934'></span>",
     "format-icons": {
-      "headphone": "🎧",
-      "hands-free": "",
-      "headset": "",
-      "phone": "",
-      "portable": "",
-      "car": "",
-      "default": ["", "", ""]
+        "headphone": "",
+        "hands-free": "",
+        "headset": "",
+        "phone": "",
+        "phone-muted": "󰷯",
+        "portable": "",
+        "car": "",
+        "default": ["", ""]
     },
     "min-length": 7,
     "max-length": 12,
