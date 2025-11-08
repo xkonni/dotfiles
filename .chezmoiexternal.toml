@@ -37,43 +37,36 @@
 {{- if eq .chezmoi.os "darwin" }}
 {{-   $fontDir = "Library/Fonts" }}
 {{- end }}
-["{{ $fontDir }}/CaskaydiaCove Bold.ttf"]
+["{{ $fontDir }}/CaskaydiaCoveNerdFontMono-Bold.ttf"]
     type = "file"
-    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Bold.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/CascadiaCode/CaskaydiaCoveNerdFontMono-Bold.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/CaskaydiaCove ExtraLight.ttf"]
+["{{ $fontDir }}/CaskaydiaCoveNerdFontMono-BoldItalic.ttf"]
     type = "file"
-    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-ExtraLight.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/CascadiaCode/CaskaydiaCoveNerdFontMono-BoldItalic.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/CaskaydiaCove Light.ttf"]
+["{{ $fontDir }}/CaskaydiaCoveNerdFontMono-Italic.ttf"]
     type = "file"
-    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Light.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/CascadiaCode/CaskaydiaCoveNerdFontMono-Italic.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/CaskaydiaCove Medium.ttf"]
+["{{ $fontDir }}/CaskaydiaCoveNerdFontMono-Regular.ttf"]
     type = "file"
-    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Medium.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/CascadiaCode/CaskaydiaCoveNerdFontMono-Regular.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/CaskaydiaCove Regular.ttf"]
+
+["{{ $fontDir }}/MesloLGMNerdFontMono-Bold.ttf"]
     type = "file"
-    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-Regular.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/Meslo/M/Bold/MesloLGMNerdFontMono-Bold.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/CaskaydiaCove SemiBold.ttf"]
+["{{ $fontDir }}/MesloLGMNerdFontMono-BoldItalic.ttf"]
     type = "file"
-    url = "https://github.com/eliheuer/caskaydia-cove/raw/refs/heads/master/fonts/ttf/CaskaydiaCove-SemiBold.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/Meslo/M/Bold-Italic/MesloLGMNerdFontMono-BoldItalic.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/MesloLGS NF Regular.ttf"]
+["{{ $fontDir }}/MesloLGMNerdFontMono-Italic.ttf"]
     type = "file"
-    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Regular.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/Meslo/M/Italic/MesloLGMNerdFontMono-Italic.ttf"
     refreshPeriod = "168h"
-["{{ $fontDir }}/MesloLGS NF Bold.ttf"]
+["{{ $fontDir }}/MesloLGMNerdFontMono-Regular.ttf"]
     type = "file"
-    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Bold.ttf"
-    refreshPeriod = "168h"
-["{{ $fontDir }}/MesloLGS NF Italic.ttf"]
-    type = "file"
-    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Italic.ttf"
-    refreshPeriod = "168h"
-["{{ $fontDir }}/MesloLGS NF Bold Italic.ttf"]
-    type = "file"
-    url = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS NF Bold Italic.ttf"
+    url = "https://github.com/ryanoasis/nerd-fonts/raw/refs/heads/master/patched-fonts/Meslo/M/Regular/MesloLGMNerdFontMono-Regular.ttf"
     refreshPeriod = "168h"
