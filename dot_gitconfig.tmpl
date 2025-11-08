@@ -197,8 +197,8 @@
     enabled = true
 
 [user]
-    email = {{ .email | quote }}
-    name = {{ .name }}
+    email = {{ (index . "email") | default "xkonni@posteo.de" | quote }}
+    name = {{ (index . "name") | default "xkonni" | quote }}
 
 [credential]
     helper = cache --timeout 3600
