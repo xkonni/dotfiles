@@ -1,8 +1,16 @@
 # vim: ft=zsh
-# zsh general
-alias zr="znap restart"
+# ohmyzsh
+alias omr='omz reload'
+alias omu='omz update'
+# chezmoi
 alias cm="chezmoi"
 alias cma="chezmoi apply"
+alias cme="chezmoi edit"
+alias cmc="chezmoi cd"
+alias cmd="chezmoi diff"
+# gemini
+alias gm='pushd ~/workspace/gemini; gemini; popd'
+alias gm='pushd ~/workspace/gemini; gemini; popd'
 
 # These aliases enable us to paste example code into the terminal without the
 # shell complaining about the pasted prompt symbol.
