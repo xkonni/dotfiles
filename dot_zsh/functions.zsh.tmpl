@@ -1,19 +1,18 @@
 # vim: ft=zsh
 # FUNCTIONS
-if [[ ${OS} == "Darwin" ]]
-then
-    function open() {
-      for i in $@; do
-        xdg-open $i &> /dev/null &
-      done
-    }
-fi
+{{ if eq .chezmoi.os "linux" -}}
+function open() {
+  for i in $@; do
+    xdg-open $i &> /dev/null &
+  done
+}
 
 function remod() {
   sudo modprobe -r $* && \
   sleep 1 && \
   sudo modprobe $*
 }
+{{ end -}}
 
 function isleep() {
   if [ "$1" = "-h" ]; then

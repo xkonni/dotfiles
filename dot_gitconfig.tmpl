@@ -79,7 +79,7 @@
     c = commit -m                     # commit with message
     ca = commit -am                   # commit all with message
     cam = commit --amend              # ammend your last commit
-    amend = commit --amend            # ammend your last commit
+    caam = commit -a --amend          # ammend all to your last commit
     # uncommit
     uncommit = reset HEAD^
 
@@ -111,6 +111,7 @@
 
     # push
     ps = push                         # push
+    psf = push -f                     # push
 
     # rebase
     rc = rebase --continue            # continue rebase
@@ -141,8 +142,9 @@
     t = tag -n                        # show tags with <n> lines of each tag message
 
     # whatchanged
-    lw   = whatchanged -n 1
-    w   = whatchanged -n 10
+    w  = log --raw --no-merges -n 10
+    wv = log --raw --no-merges
+    wq = log --raw --no-merges -n 1
 
 {{- if eq .chezmoi.hostname "DNWJGT2PTJ" }}
     rv = !git push origin +$(git rev-parse --abbrev-ref HEAD)

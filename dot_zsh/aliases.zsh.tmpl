@@ -70,7 +70,11 @@ then
     local cat=${bat:0:1}
     alias fz="${find} --type f . | fzf --preview \"${cat} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} ${cat} {}"
     alias fzv="${find} --type f . | fzf --preview \"${cat} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} vim {}"
+{{ if eq .chezmoi.os "darwin" -}}
+    alias fzo="${find} --type f . | fzf --preview \"${cat} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} open {}"
+{{ else if eq .chezmoi.os "linux" -}}
     alias fzo="${find} --type f . | fzf --preview \"${cat} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} xdg-open {}"
+{{ end -}}
 fi
 
 # global aliases
