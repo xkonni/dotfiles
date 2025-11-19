@@ -83,12 +83,4 @@ alias sl='ssh-add -l'
 alias sas="ssh_save"
 alias sal="ssh_load"
 
-{{ if eq .chezmoi.os "darwin" -}}
 eval $(keychain --eval 2>/dev/null)
-{{ else if eq .chezmoi.os "linux" -}}
-if [ -n "$SSH_AUTH_SOCK" -a -e $SSH_AUTH_SOCK ]; then
-  ssh_save
-else
-  ssh_load
-fi
-{{ end -}}
