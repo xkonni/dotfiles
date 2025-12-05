@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# This script runs whenever the vim configuration changes
+# Hash of vim configuration files to trigger updates:
+# dot_vimrc hash: {{ include "dot_vimrc" | sha256sum }}
+# plug.vim hash: {{ include "dot_vim/settings/plug.vim" | sha256sum }}
+
+echo "Updating Vim plugins with vim-plug..."
+
+# Check if vim is available
+if ! command -v vim >/dev/null 2>&1; then
+  echo "vim is not installed. Skipping plugin update."
+  exit 0
+fi
+
+# Check if vim-plug is installed
+if [ ! -f "$HOME/.vim/autoload/plug.vim" ]; then
+  echo "vim-plug is not installed. Skipping plugin update."
+  exit 0
+fi
+
+# Run PlugUpdate in vim
+echo "Running :PlugUpdate..."
+vim +PlugUpdate +qall
+
+echo "Vim plugins updated successfully."
