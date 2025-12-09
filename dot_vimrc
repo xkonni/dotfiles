@@ -11,7 +11,8 @@ call tcomment#type#Define('c', '// %s')
 call tcomment#type#Define('cpp', '// %s')
 
 syntax on
-set list listchars=tab:\ \ ,trail:·
+set list
+set listchars=tab:▸\ ,trail:·,extends:→,precedes:←,nbsp:␣
 
 set ignorecase
 set smartcase
