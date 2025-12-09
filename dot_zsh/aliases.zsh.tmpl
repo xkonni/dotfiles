@@ -1,16 +1,27 @@
 # vim: ft=zsh
+# aliases and simple functions
+#
+
 # ohmyzsh
 alias omr='omz reload'
 alias omu='omz update'
+
 # chezmoi
-alias cm="chezmoi"
-alias cma="chezmoi apply"
-alias cme="chezmoi edit"
-alias cmc="chezmoi cd"
-alias cmd="chezmoi diff"
+alias cm='chezmoi'
+alias cma='chezmoi apply'
+alias cmc='chezmoi cd'
+alias cmd='chezmoi diff'
+alias cme='chezmoi edit'
+alias cmu='chezmoi update'
+
 # gemini
 alias gm='pushd ~/workspace/gemini; gemini; popd'
 alias gm='pushd ~/workspace/gemini; gemini; popd'
+
+# tmux
+alias tm='tmux'
+alias tma='tmux att -t'
+alias tml='tmux ls'
 
 # These aliases enable us to paste example code into the terminal without the
 # shell complaining about the pasted prompt symbol.
@@ -95,6 +106,14 @@ alias S='ssh'
 alias SA='ssh-add'
 alias SL='ssh-add -l'
 alias SE='eval $(keychain --eval)'
+function rtssh() {
+    while true
+    do
+        ssh $*
+        echo "retrying in 3..."
+        sleep 3
+    done
+}
 
 # CLIPBOARD
 {{ if eq .chezmoi.os "darwin" -}}
