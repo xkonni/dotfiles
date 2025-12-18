@@ -1,4 +1,0 @@
-#!/bin/bash
-
-xdg-open "$(rg --no-messages --max-depth 4 --sortr modified --files $HOME $HOME/Cloud/* | \
-    sort -h | wofi --dmenu --insensitive --prompt 'recent files')"

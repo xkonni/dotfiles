@@ -1,4 +1,0 @@
-#!/bin/bash
-
-eval $(systemctl --user show-environment | grep -i ssh)
-wofi --show drun --prompt applications
