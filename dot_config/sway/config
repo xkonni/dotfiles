@@ -29,7 +29,7 @@ set $font Cascadia Code PL Regular 10
 set $notify_cmd dunstify -r 123
 
 # Your preferred application launcher
-set $run_cmd fuzzel
+set $run_cmd fuzzel -F name,comment
 
 #
 # Host Specific
