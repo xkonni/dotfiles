@@ -7,15 +7,8 @@ SCROT_APP_ARGS=" -t png -l 0"
 SCROT_FILE_BASE=$HOME/.lockscreen
 SCROT_FILE_EXT=png
 LOCK_APP=swaylock
-# LOCK_ARGS=" -f -F -e -s fill -c 000000 --indicator-radius 100 --indicator-thickness 20"
 LOCK_ARGS=" -F -e -s fill -c 000000 --indicator-radius 100 --indicator-thickness 20"
 INHIBIT_FILE=$HOME/.inhibit_lock
-
-CONVERT=convert
-if which magick
-then
-    CONVERT="magick convert"
-fi
 
 function _clean() {
   for output in $(_outputs); do
@@ -50,15 +43,19 @@ function _outputs() {
 }
 
 function _screenshot() {
-  for output in $(_outputs); do
-    SCROT_FILE=${SCROT_FILE_BASE}_${output}.${SCROT_FILE_EXT}
-    echo $SCROT_FILE
-    $SCROT_APP $SCROT_APP_ARGS -o $output $SCROT_FILE
-    # convert -blur 0x5 $SCROT_FILE $SCROT_FILE
-    # convert -motion-blur 15x15 $SCROT_FILE $SCROT_FILE
-    $CONVERT -scale 20% -blur 2x2 -resize 500% $SCROT_FILE $SCROT_FILE
-    $CONVERT -composite -gravity center $SCROT_FILE $LOCK_IMAGE $SCROT_FILE
-  done
+    pids=""
+    for output in $(_outputs); do
+        (
+            SCROT_FILE="${SCROT_FILE_BASE}_${output}.${SCROT_FILE_EXT}"
+            $SCROT_APP $SCROT_APP_ARGS -o "$output" "$SCROT_FILE"
+            magick "$SCROT_FILE" \
+                -filter Gaussian -resize 10% -define filter:sigma=1.5 -resize 1000% "$LOCK_IMAGE" \
+                -gravity center -composite -define png:compression-level=0 "$SCROT_FILE"
+        ) &
+        pids="$pids $!"
+    done
+    # Wait for all monitors to finish before exiting the function
+    wait $pids
 }
 
 ## main
