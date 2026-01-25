@@ -1,4 +1,5 @@
 # vim: ft=zsh
+SSH_AUTH_SOCK=/run/user/$(id -u)/gcr/ssh
 SSH_AUTH_SOCK_FILE=~/.ssh/SSH_AUTH_SOCK
 LOGDIRS=(/run/user/$(id -u) /var/tmp/)
 LOGFILE=ssh_auth_sock.log
@@ -70,17 +71,10 @@ function save_file() {
   echo $SSH_AUTH_SOCK >$SSH_AUTH_SOCK_FILE
 }
 
-function ssh_find() {
-  local SSH_AUTH_SOCK_BASE="/tmp/ssh-"
-  local SSH_AUTH_SOCK_TMP=$(ls ${SSH_AUTH_SOCK_BASE}*/agent*(om[1]))
-  if [ -n "$SSH_AUTH_SOCK_TMP" ]; then
-    export SSH_AUTH_SOCK=$SSH_AUTH_SOCK_TMP
-    ssh_save
-  fi
-}
-
 alias sl='ssh-add -l'
 alias sas="ssh_save"
 alias sal="ssh_load"
 
-eval $(keychain --eval 2>/dev/null)
+{{ if eq .chezmoi.os "linux" -}}
+export SSH_AUTH_SOCK
+{{- end }}
