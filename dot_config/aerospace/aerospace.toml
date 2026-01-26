@@ -233,20 +233,20 @@ automatically-unhide-macos-hidden-apps = true
     j = 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"'
     k = 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"'
     l = 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"'
-    q = 'exec-and-forget open -g "rectangle://execute-action?name=top-left'
+    q = 'exec-and-forget open -g "rectangle://execute-action?name=top-left-sixth"'
     w = 'exec-and-forget open -g "rectangle://execute-action?name=top-center-sixth"'
-    e = 'exec-and-forget open -g "rectangle://execute-action?name=top-right"'
-    a = 'exec-and-forget open -g "rectangle://execute-action?name=left-half"'
-    s = 'exec-and-forget open -g "rectangle://execute-action?name=center-half"'
-    d = 'exec-and-forget open -g "rectangle://execute-action?name=right-half"'
-    z = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-left"'
+    e = 'exec-and-forget open -g "rectangle://execute-action?name=top-right-sixth"'
+    a = 'exec-and-forget open -g "rectangle://execute-action?name=first-third"'
+    s = 'exec-and-forget open -g "rectangle://execute-action?name=center"'
+    d = 'exec-and-forget open -g "rectangle://execute-action?name=last-third"'
+    z = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-left-sixth"'
     x = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-center-sixth"'
-    c = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-right"'
+    c = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-right-sixth"'
 
 [workspace-to-monitor-force-assignment]
-    1 = ['PG49WCD', 'DELL C3422WE', 'Built-in Retina Display']
-    2 = ['PG49WCD', 'DELL C3422WE', 'Built-in Retina Display']
-    3 = ['PG49WCD', 'DELL C3422WE', 'Built-in Retina Display']
+    1 = ['PG49WCD','DELL P2723DE',  'DELL C3422WE', 'Built-in Retina Display']
+    2 = ['PG49WCD','DELL P2723DE',  'DELL C3422WE', 'Built-in Retina Display']
+    3 = ['PG49WCD','DELL P2723DE',  'DELL C3422WE', 'Built-in Retina Display']
     4 = ['DELL P2723DE', 'PG49WCD', 'Built-in Retina Display', 'DELL C3422WE']
     5 = ['DELL P2723DE', 'PG49WCD', 'Built-in Retina Display', 'DELL C3422WE']
     6 = ['DELL P2723DE', 'PG49WCD', 'Built-in Retina Display', 'DELL C3422WE']
