@@ -14,6 +14,17 @@ alias cmd='chezmoi diff'
 alias cme='chezmoi edit'
 alias cmu='chezmoi update'
 
+# git
+alias gl='git log --graph --date=short -n 10'
+alias gll='git log --graph --date=short'
+alias glf='git log --graph --date=short -n 5 --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
+alias gllf='git log --graph --date=short --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
+alias glp='git log --graph --date=short -n 1 --patch'
+alias gllp='git log --graph --date=short -n 5 --patch'
+alias gpl='git pull'
+alias gs='git status'
+alias gss='git status -s'
+
 # gemini
 alias gm='pushd ~/workspace/gemini; gemini; popd'
 alias gm='pushd ~/workspace/gemini; gemini; popd'
@@ -51,7 +62,7 @@ if type -p ${bat:0:1} &> /dev/null
 then
     local cat=${bat:0:1}
     alias cat=$cat
-    alias less="$cat --pager='less -RF -j4'"
+    alias less="$cat --pager='less -RFI -j4'"
     # bat tail log
     alias btl="$cat --paging=never -l log"
     export PAGER=$cat
