@@ -12,7 +12,7 @@ PWR_CMD="$HOME/.config/sway/bin/sway_power"
 #  120 min    suspend
 pkill -x swayidle
 swayidle -w \
-    timeout 540 "$TERM_CMD bash -c 'dunstify -r 123 -u critical -t 300 display\ will\ turn\ off\ soon'" \
+    timeout 540 "$TERM_CMD bash -c 'notify-send -r 123 -u critical -t 300 display\ will\ turn\ off\ soon'" \
     resume "$LOCK_CMD on" \
     timeout 1800 "$LOCK_CMD off" \
     # timeout 900 "$LOCK_CMD lockonly" \
