@@ -26,7 +26,7 @@ set $lock_cmd $HOME/.config/sway/bin/sway_lock lock
 set $move_cmd $HOME/.config/sway/bin/sway_move
 set $resize_cmd $HOME/.config/sway/bin/sway_resize
 set $font Cascadia Code PL Regular 10
-set $notify_cmd dunstify -r 123
+set $notify_cmd notify-send -r 123
 
 # Your preferred application launcher
 set $run_cmd fuzzel -F name,comment
@@ -250,10 +250,9 @@ bindsym $alt+Shift+u exec notify-send $$main
 #
 # Notifications
 #
-bindsym $alt+comma exec dunstctl close
-bindsym $alt+Shift+comma exec dunstctl close-all
-bindsym $alt+period exec dunstctl history-pop
-bindsym $alt+Shift+period exec dunstctl set-paused toggle
+bindsym $alt+comma exec swaync-client --close-latest
+bindsym $alt+Shift+comma exec swaync-client --close-all
+bindsym $alt+period exec swaync-client --toggle-panel
 
 #
 # Modes
