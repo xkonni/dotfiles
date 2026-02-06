@@ -1,74 +1,419 @@
-:root {
-    --color-dark-primary: #1c1c1c;
-    --color-dark-secondary: #2d2d2d;
-    --color-white: #fff;
-    --color-active: #6699cc;
-    --color-urgent: #8f0a0a;
-
-    --margin-lg: 1em;
-    --margin-sm: 0.5em;
-}
+@import 'srcery.css';
 
 * {
-    border-radius: 0;
-    border: none;
+    font-family: "CaskaydiaCove Nerd Font Mono";
+    font-size: 13px;
     box-shadow: none;
+    border: none;
+    border-radius: 0px;
+    border-image: none;
     background-image: none;
-    font-family: monospace;
-}
-
-#bar, popover, popover contents, calendar {
-    background-color: var(--color-dark-primary);
-}
-
-box, button, label {
-    background-color: #0000;
-    color: var(--color-white);
+    outline: none;
+    text-shadow: none;
+    margin: 0;
+    padding: 0;
 }
 
 button {
-    padding-left: var(--margin-sm);
-    padding-right: var(--margin-sm);
+    box-shadow: none;
+    border: none;
+    background: none;
+    outline: none;
+    text-shadow: none;
 }
 
-button:hover, button:active {
-    background-color: var(--color-dark-secondary);
+.background {
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
-#end > * + * {
-    margin-left: var(--margin-lg);
+scale slider {
+  margin: -4px;
+  min-width: 12px;
+  min-height: 12px;
 }
 
-.sysinfo > * + * {
-    margin-left: var(--margin-sm);
+@keyframes blinker {
+  50% {
+    color: @srcery-red;
+  }
 }
 
-.clock {
+#bar {
+    /* background-color: @srcery-black; */
+    /* box-shadow: inset 0 4 0 0 @srcery-xgray2; */
+    min-height: 1.93em;
+}
+
+/* base */
+.tray,
+.notifications,
+.button,
+.widget,
+.upower,
+.clock,
+.workspaces,
+.system,
+#lyrics,
+#foco,
+#wifi,
+#system {
+    margin-left: 4px;
+    transition: all 0.5s;
+    transition-timing-function: ease;
+
+}
+
+.workspaces {
+    background-color: transparent;
+    margin-left: 0px;
+}
+
+/*  -------- WORKSPACES ---------  */
+.workspaces .item {
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    transition: all 0.5s;
+    transition-timing-function: ease;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 3px;
+    /* background-color: @srcery-black; */
+    border-radius: 0 0 .4em .4em;
+}
+
+.workspaces .item:not(:nth-child(1)){
+    margin-left: 4px;
+}
+
+.workspaces .item.focused:hover,
+.workspaces .item.focused {
     font-weight: bold;
+    box-shadow: inset 0px 35px 0px 0px @srcery-bright-blue;
+    color: @srcery-black;
 }
 
-.popup-clock .calendar-clock {
+.workspaces .item.inactive {
+    /* background-color: @srcery-hard-black; */
+    box-shadow: inset 0px 2px 0px 0px @srcery-xgray2;
+    color: @srcery-xgray2;
+}
+.workspaces .item.inactive:hover {
+    box-shadow: inset 0px 6px 0px 0px @srcery-xgray5;
+    color: @srcery-xgray5;
+}
+
+.workspaces .item.urgent,
+.workspaces .item focused urgent
+.workspaces .item.urgent:hover{
+    animation: blinker 1s linear infinite;
+}
+
+.workspaces .item:hover{
+    box-shadow: inset 0px 6px 0px 0px @srcery-bright-blue;
+}
+
+/*  -------- MUSIC ---------  */
+.music{
+    /* background-color: @srcery-black; */
+    border-radius: 0 0 .4em .4em;
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
+.music label{
+    /* font-size: 16px; */
+}
+
+.music:hover{
+    box-shadow: inset 0px 35px 0px 0px @srcery-bright-blue;
+    color: @srcery-black;
+}
+
+.popup-music {
     background-color: @srcery-black;
-    box-shadow: inset 0px 4px 0px 0px @srcery-cyan;
+    box-shadow: inset 0px 2px 0px 0px @srcery-cyan;
     margin-top: 3px;
     padding: 20px 20px 20px 20px;
     border-radius: 0 0 .5em .5em;
-    font-size: 2.0em;
 }
 
-.popup-clock .calendar .today {
-    background-color: var(--color-active);
+.popup-music .title .icon-box .text-icon,
+.popup-music .artist .icon-box .text-icon,
+.popup-music .volume .icon,
+.popup-music .album .icon-box .text-icon {
+    font-family: JetBrainsMono NFP;
+    color: @srcery-cyan;
 }
 
-.workspaces .item.visible {
-    box-shadow: inset 0 -1px var(--color-white);
+.popup-music .controls {
+    margin-left: 17px;
+}
+.popup-music .controls label {
+    font-family: JetBrainsMono NFP;
+    padding-right: 16px;
+    color: @srcery-cyan;
 }
 
-.workspaces .item.focused {
-    box-shadow: inset 0 -1px var(--color-active);
-    background-color: var(--color-dark-secondary);
+.popup-music .controls *:disabled {
+    color: @srcery-white;
 }
 
-.workspaces .item.urgent {
-    background-color: var(--color-urgent);
+.popup-music .title .icon-box .text-icon,
+.popup-music .artist .icon-box .text-icon,
+.popup-music .album .icon-box .text-icon {
+    min-width: 20px;
+}
+
+.popup-music .volume label  {
+    margin-right: 18px;
+}
+
+.popup-music .progress scale trough,
+.popup-music .volume scale trough {
+    background-color: @srcery-bright-black;
+}
+
+.popup-music .progress scale trough highlight,
+.popup-music .volume scale trough highlight{
+    background-color: @srcery-cyan;
+}
+
+.popup-music .volume .slider slider,
+.popup-music .progress .slider slider {
+    background-color: @srcery-white;
+    border-radius: 100%;
+}
+
+.popup-music .progress .label,
+.popup-music .volume text {
+    color: @srcery-bright-black;
+}
+
+/*  -------- FOCUSED ---------  */
+#foco .label{
+    /* background-color: @srcery-black; */
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+    border-radius: 0 0 .4em .4em;
+}
+
+/*  -------- SWAYMODE ---------  */
+.sway_mode {
+    color: @srcery-magenta;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
+/*  -------- NETWORK ---------  */
+.network_manager {
+    /* background-color: @srcery-black; */
+    box-shadow: inset 0px 2px 0px 0px @srcery-magenta;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+    border-radius: 0 0 .4em .4em;
+}
+
+/*  -------- VOLUME ---------  */
+.volume {
+    /* background-color: @srcery-black; */
+    border-radius: 0 0 .4em .4em;
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
+.volume:hover {
+    box-shadow: inset 0px 35px 0px 0px @srcery-bright-blue;
+    color: @srcery-black;
+}
+.popup-volume{
+    border-radius: 0 0 .4em .4em;
+    background-color: @srcery-black;
+    box-shadow: inset 0px 2px 0px 0px @srcery-bright-blue;
+    margin-top: 3px;
+    padding: 20px 20px 20px 20px;
+}
+
+.popup-volume .device-box scale trough,
+.popup-volume .apps-box scale trough
+{
+    background-color: @srcery-bright-black;
+}
+
+.popup-volume .device-box scale trough highlight,
+.popup-volume .apps-box scale trough highlight
+{
+    background-color: @srcery-bright-blue;
+}
+
+.popup-volume .device-box .slider slider,
+.popup-volume .apps-box .slider slider {
+    background-color: @srcery-white;
+    border-radius: 100%;
+}
+
+.popup-volume .device-box button label,
+.popup-volume .apps-box button label{
+    color: @srcery-bright-blue;
+}
+/*  -------- BATTERY ---------  */
+.upower {
+    /* background-color: @srcery-black; */
+    border-radius: 0 0 .4em .4em;
+    box-shadow: inset 0px 2px 0px 0px @srcery-orange;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
+.upower:hover {
+    color: @srcery-black;
+    box-shadow: inset 0px 32px 0px 0px @srcery-orange;
+}
+
+.popup-upower {
+    border-radius: 0 0 .4em .4em;
+    background-color: @srcery-black;
+    box-shadow: inset 0px 2px 0px 0px @srcery-orange;
+    margin-top: 3px;
+    padding: 20px 20px 20px 20px;
+}
+
+/*  -------- SYSINFO ---------  */
+.sysinfo .item{
+    border-radius: 0 0 .4em .4em;
+    /* background-color: @srcery-black; */
+    padding-left:4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
+.sysinfo .item:not(:nth-child(1)){
+    margin-left: -6px;
+}
+
+.sysinfo .item:nth-child(1) {
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+}
+
+.sysinfo .item:nth-child(2) {
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+}
+
+.sysinfo .item:nth-child(3) {
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+}
+
+
+
+/*  -------- NOTIFICATIONS ---------  */
+.notifications button  {
+    margin-left: 4px;
+    /* font-family: IosevkaTermNerdFontMono; */
+    /* background-color: @srcery-black; */
+    padding-top: 3px;
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    border-radius: 0 0 .4em .4em;
+}
+
+.notifications button:hover  {
+    box-shadow: inset 0px 40px 0px 0px @srcery-blue;
+}
+
+.notifications .count {
+    /* font-family: IosevkaTermNerdFontMono; */
+    font-size: .6rem;
+    box-shadow: none;
+    background-color: @srcery-red;
+    color: @srcery-bright-white;
+    margin-top:6px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-radius: 100%;
+    opacity: 1;
+}
+
+/*  -------- CLOCK ---------  */
+.clock {
+    padding-left:4px;
+    padding-right:4px;
+    padding-top: 3px;
+    border-radius: 0 0 .4em .4em;
+    /* background-color: @srcery-black; */
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+}
+
+.clock:hover {
+    box-shadow: inset 0px 35px 0px 0px @srcery-bright-blue;
+    color: @srcery-black;
+}
+
+.popup-clock .calendar-clock {
+    color: @srcery-bright-white;
+    font-size: 2.2em;
+    margin-top: 3px;
+    margin-bottom: 7px;
+    padding: 0px 2em 0px 2em;
+    border-radius: 7px;
+    background-color: @srcery-black;
+}
+
+.popup-clock .calendar {
+    transition: all 0.3s;
+    background-color: @srcery-black;
+    color: @srcery-bright-white;
+    border-radius: .4em;
+}
+
+.popup-clock .calendar .header {
+    padding-top: 1em;
+}
+
+.popup-clock .calendar label:selected {
+    background-color: @srcery-black;
+    color: @srcery-black;
+}
+
+/* Calendar day labels styling */
+.popup-clock .calendar label.day-name {
+    color: @srcery-bright-blue;
+}
+
+.popup-clock .calendar label.day-number {
+    color: @srcery-bright-white;
+}
+
+.popup-clock .calendar label.week-number {
+    color: blue;
+}
+
+.popup-clock .calendar label.other-month {
+    color: @srcery-xgray5;
+}
+
+.popup-clock .calendar label.today {
+    color: @srcery-bright-blue;
+}
+
+/*  -------- TRAY ---------  */
+.tray {
+    /* background-color: @srcery-black; */
+    border-radius: 0 0 .4em .4em;
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
+.tray .item {
+    padding-left:4px;
+    padding-right:4px;
 }
