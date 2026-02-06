@@ -26,7 +26,7 @@ set $lock_cmd $HOME/.config/sway/bin/sway_lock lock
 set $move_cmd $HOME/.config/sway/bin/sway_move
 set $resize_cmd $HOME/.config/sway/bin/sway_resize
 set $font Cascadia Code PL Regular 10
-set $notify_cmd notify-send -r 123
+set $notify_cmd notify-send -e -r 2
 
 # Your preferred application launcher
 set $run_cmd fuzzel -F name,comment

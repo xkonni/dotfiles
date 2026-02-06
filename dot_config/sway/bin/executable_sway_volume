@@ -1,7 +1,8 @@
 #!/bin/bash
 source $HOME/.config/sway/bin/sway_helpers
 ICON_PATH=$HOME/.local/share/icons/Tela-circle-dark/16/actions
-NOTIFY_APP="notify-send -a volume -h string:x-swaync-stack-tag:volume"
+NOTIFY_ID=3
+NOTIFY_CMD="notify-send -e -r ${NOTIFY_ID} -a volume -h string:x-swaync-stack-tag:volume"
 APP="pavucontrol"
 SOUND=$HOME/.config/sway/bin/audio-volume-change.oga
 
@@ -42,14 +43,16 @@ function notify() {
     SOURCE_ICON=""
   fi
   TITLE="${SINK_ICON} ${SINK_VOLUME}% / ${SOURCE_ICON} ${SOURCE_VOLUME}%"
-  # $NOTIFY_APP -i $ICON -a "Volume" "$TEXT"
-  $NOTIFY_APP -i $ICON "$TITLE" "$DESC\n$(getProgressString 10 "$VOL1" "$VOL2" $SINK_VOLUME)"
+  $NOTIFY_CMD -i $ICON "$TITLE" "$DESC\n$(getProgressString 10 "$VOL1" "$VOL2" $SINK_VOLUME)"
 }
 
 function _toggle_sink() {
-    sink_next=$(pactl list sinks | grep node\.name | grep -oE '"[a-zA-Z0-9_.-]*"' | grep -v $1 | sed 's/"//g' | sort -R | head -n 1)
-  echo "$sink_next"
-  pactl set-default-sink $sink_next
+  sink_next=$(pactl list sinks | grep node\.name | grep -oE '"[a-zA-Z0-9_.:-]*"' | grep -v $1 | sed 's/"//g' | sort -R | head -n 1)
+  if [ -z "$sink_next" ]; then
+      echo "ERROR no next sink found."
+  else
+      pactl set-default-sink $sink_next
+  fi
 }
 
 ##  helpers
@@ -112,6 +115,6 @@ case $1 in
     ;;
   *)
     echo "invalid command: \"$1\""
-    echo "arguments: [decrease|increase|mute|gui]"
+    echo "arguments: [decrease|increase|mute|toggle-sink|gui]"
     ;;
 esac
