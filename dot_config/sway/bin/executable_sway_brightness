@@ -1,7 +1,8 @@
 #!/bin/bash
 source $HOME/.config/sway/bin/sway_helpers
 DEVICE=sysfs/backlight/intel_backlight
-NOTIFY_APP="notify-send -a brightness -h string:x-swaync-stack-tag:brightness"
+NOTIFY_ID=3
+NOTIFY_CMD="notify-send -e -r ${NOTIFY_ID} -a brightness -p -h string:x-swaync-stack-tag:brightness"
 ICON=$HOME/.local/share/icons/Tela-circle-dark/16/panel/xfpm-brightness-lcd.svg
 APP="/usr/bin/brightnessctl"
 APP_INC="$APP s 10%+"
@@ -22,19 +23,19 @@ case $1 in
     $APP_DEC &> /dev/null
     BR=$(_get_br)
     echo $BR
-    $NOTIFY_APP -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
+    $NOTIFY_CMD -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
     ;;
   i*)
     $APP_INC &> /dev/null
     BR=$(_get_br)
     echo $BR
-    $NOTIFY_APP -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
+    $NOTIFY_CMD -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
     ;;
   "-h"|"--help")
     echo "arguments: [decrease|increase]"
     ;;
   *)
     BR=$($APP_BR)
-    $NOTIFY_APP -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
+    $NOTIFY_CMD -i $ICON "$BR" "$(getProgressString 10 "$PRG1" "$PRG2" $BR)"
     ;;
 esac
