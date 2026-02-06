@@ -8,10 +8,12 @@ start:
 center:
 - type: volume
   sink_slider_orientation: horizontal
+  on_click_right: pavucontrol
 - type: music
 
 end:
 - type: notifications
+  on_click_right: swaync-client -C
 - type: battery
   show_if: |
     ls /sys/class/power_supply/ | grep --quiet '^BAT'
@@ -21,6 +23,8 @@ end:
   - '{memory_percent}% '
   interval:
     cpu: 1
+  on_click_right: foot -T float btop
 - type: tray
 - type: clock
+  show_week_numbers: true
 
