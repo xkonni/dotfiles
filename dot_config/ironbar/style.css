@@ -285,6 +285,15 @@ scale slider {
     padding: 20px 20px 20px 20px;
 }
 
+.bluetooth {
+    /* background-color: @srcery-black; */
+    border-radius: 0 0 .4em .4em;
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+    padding-left: 4px;
+    padding-right:4px;
+    padding-top: 3px;
+}
+
 /*  -------- SYSINFO ---------  */
 .sysinfo .item{
     border-radius: 0 0 .4em .4em;

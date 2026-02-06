@@ -24,6 +24,8 @@ end:
   interval:
     cpu: 1
   on_click_right: foot -T float btop
+- type: bluetooth
+  on_click_right: foot -T float bluetoothctl
 - type: tray
 - type: clock
   show_week_numbers: true
