@@ -19,8 +19,8 @@ alias gl='git log --graph --date=short -n 10'
 alias gll='git log --graph --date=short'
 alias glf='git log --graph --date=short -n 5 --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
 alias gllf='git log --graph --date=short --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
-alias glp='git log --graph --date=short -n 1 --patch'
-alias gllp='git log --graph --date=short -n 5 --patch'
+alias glp='git log --date=short -n 1 --patch'
+alias gllp='git log --date=short -n 5 --patch'
 alias gpl='git pull'
 alias gs='git status'
 alias gss='git status -s'
@@ -102,8 +102,16 @@ fi
 # global aliases
 alias -g G='| grep '
 alias -g GI='| grep -i '
+alias -g GV='| grep -v '
+alias -g GVI='| grep -vi '
+alias -g GC='| grep -c  '
+alias -g GCI='| grep -ci  '
 alias -g L='| less'
+alias -g LP='| less -l patch'
+alias -g LY='| jless --yaml'
+alias -g LJ='| jless'
 alias -g LT='*(om[1])'
+alias -g WL='| wc -l'
 
 # dmesg
 alias jdmesg="journalctl -t kernel -xf"
@@ -144,6 +152,29 @@ function PSA() {
     PS | tee -a $1
 }
 
+# WATCH
+function WT() {
+    local timeout=2
+    local count=1
+    case "$1" in
+        -h|--help)
+            echo "Usage: WT [timeout] command..."
+            echo "Runs the specified command repeatedly every [timeout] seconds (default: 2)."
+            return 0
+            ;;
+        -t)
+            timeout=$2
+            shift 2
+            ;;
+    esac
+
+    while true; do
+        echo -e "\n>> [$(date '+%Y-%m-%d %H:%M:%S')] [$count] $*"
+        eval "$@"
+        let count+=1
+        sleep $timeout
+    done
+}
 
 globalias() {
   if [[ $LBUFFER =~ '[A-Z0-9]+$' ]]; then
