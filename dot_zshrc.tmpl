@@ -115,6 +115,9 @@ autoload -U compinit && compinit
 plugins=(
     git
     fzf-tab
+{{ if eq .chezmoi.os "darwin" -}}
+    u8s
+{{ end }}
     zsh-autosuggestions
     zsh-syntax-highlighting
     vi-mode
