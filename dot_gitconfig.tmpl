@@ -149,9 +149,8 @@
     wv = log --raw --no-merges
     wq = log --raw --no-merges -n 1
 
-{{- if eq .chezmoi.hostname "DNWJGT2PTJ" }}
+    # force push to remote branch with the same name
     rv = !git push origin +$(git rev-parse --abbrev-ref HEAD)
-{{- end }}
 
 [format]
     pretty = format:%C(33)%ad%Creset %C(136)%h%C(70)%d%Creset %C(33)%s %C(162) [%an]%Creset
