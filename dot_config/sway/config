@@ -347,8 +347,8 @@ for_window [app_id="firefox" title="Firefox — Sharing Indicator"] floating ena
 for_window [app_id="firefox" title="Firefox - Sharing Indicator"] floating enable
 for_window [app_id="firefox" title="Picture-in-Picture"] floating enable
 # mark rules
-for_window [class="Plexamp" window_type="normal"] mark s
-for_window [app_id="Plexamp"] mark s
+for_window [class="Plexamp" window_type="normal"] mark d
+for_window [app_id="Plexamp"] mark d
 for_window [class="Ferdium" window_type="normal" window_role="browser-window"] mark z
 for_window [app_id="ferdium"] mark z
 for_window [class="Signal" window_type="normal" window_role="browser-window"] mark x

@@ -1,0 +1,14 @@
+[Unit]
+Description=Prevents swayidle from sleeping while any application is outputting or receiving audio
+Documentation=https://github.com/Alexays/Waybar/wiki/
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+ExecStart=sway-audio-idle-inhibit
+ExecStop=kill -9 $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

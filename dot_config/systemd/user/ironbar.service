@@ -1,0 +1,15 @@
+[Unit]
+Description=A customisable and feature-rich GTK4 bar for Wayland compositors, written in Rust.
+Documentation=https://github.com/JakeStanger/ironbar/wiki
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+ExecStart=env LC_TIME=de_DE.UTF-8 /usr/bin/ironbar
+ExecReload=kill -SIGUSR2 $MAINPID
+ExecStop=kill -9 $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
