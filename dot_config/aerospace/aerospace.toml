@@ -264,6 +264,11 @@ automatically-unhide-macos-hidden-apps = true
 #     check-further-callbacks = true
 #     run = ['layout floating', 'move-node-to-workspace S']  # The callback itself
 
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.Outlook'
+    check-further-callbacks = true
+    run = ['move-node-to-workspace 5']
+
 # exec-on-workspace-change = ['/bin/bash', '-c',
 #     '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
 # ]
