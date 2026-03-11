@@ -1,46 +1,56 @@
 {{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
 # vim: ft=zsh
-alias k="u8s kubectl --"
+k() { u8s kubectl "$@" }
+compdef k=kubectl
+
 alias kn="u8s set --namespace"
 alias kc="u8s set --context"
 alias kk="u8s set --kubeconfig"
 
-alias h="u8s helm --"
-alias h3="u8s helm3 --"
+h() { u8s helm "$@" }
+compdef h=helm
+h3() { u8s helm3 "$@" }
+compdef h3=helm
 
-alias ke="u8s kubectl -- exec -ti"
-alias kl="u8s kubectl -- logs"
-alias klf="u8s kubectl -- logs -f"
-alias kg="u8s kubectl -- get"
-alias kga="u8s kubectl -- get --all-namespaces"
-alias kgm="u8s kubectl -- get -n metal-servers"
-alias kgp="u8s kubectl -- get pods -o wide"
-alias kgpa="u8s kubectl -- get pods -o wide --all-namespaces"
-alias kgn="u8s kubectl -- get nodes -L container-linux-update.v1.coreos.com/version -L failure-domain.beta.kubernetes.io/zone"
-alias kdn="u8s kubectl -- describe node"
-alias kdp="u8s kubectl -- describe pod"
-alias kds="u8s kubectl -- describe service"
+alias ke='k exec -ti'
+alias kl='k logs'
+alias klf='k logs -f'
+alias kg='k get'
+alias kga='k get --all-namespaces'
+alias kgm='k get -n metal-servers'
+alias kgp='k get pods -o wide'
+alias kgpa='k get pods -o wide --all-namespaces'
+alias kgn='k get nodes -L container-linux-update.v1.coreos.com/version -L failure-domain.beta.kubernetes.io/zone'
+alias kds='k describe service'
 
 alias -g OY="-o yaml"
 alias -g OYL="-o yaml | bat -l yaml"
 alias -g OW="-o wide"
 
+function u8s_env() {
+  u8s env | while IFS='=' read -r k v; do export "$k"="$v"; done
+}
+
 function metal-eval() {
-    if [ -z "$KUBECONFIG" ]; then
+    u8s_env
+    if [ -z "$U8S_KUBECONFIG" ]; then
         echo "kubectl KUBECONFIG missing, exiting." >&2
         return 1
     fi
-    echo ">> metal-eval in $KUBECTL_CONTEXT"
-    read mns mpod mcont <<<$(kubectl get pods --all-namespaces -o wide | grep 'metal-operator-controller-manager' | awk '{print $1, $2, $8}')
-    read bns bpod bcont <<<$(kubectl get pods --all-namespaces -o wide | grep 'boot-operator-controller-manager' | awk '{print $1, $2, $8}')
-    read dns dpod dcont <<<$(kubectl get pods --all-namespaces -o wide | grep 'metal-operator-dnsmasq' | awk '{print $1, $2, $8}')
-    printf ">> %-15s\n>  %3s=%20s %4s=%50s %5s=%s\n" \
+    echo ">> metal-eval in $U8S_CONTEXT"
+    read mns mpod mcont <<<$(k get pods --all-namespaces -o wide | grep 'metal-operator-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
+    read bns bpod bcont <<<$(k get pods --all-namespaces -o wide | grep 'boot-operator-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
+    read dns dpod dcont <<<$(k get pods --all-namespaces -o wide | grep 'metal-operator-dnsmasq' | grep -v Completed | awk '{print $1, $2, $8}')
+    read ans apod acont <<<$(k get pods --all-namespaces -o wide | grep 'argora-remote-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
+    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "metal-operator" mns "$mns" mpod "$mpod" mcont "$mcont"
-    printf ">> %-15s\n>  %3s=%20s %4s=%50s %5s=%s\n" \
+    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "boot-operator" bns "$bns" bpod "$bpod" bcont "$bcont"
-    printf ">> %-15s\n>  %3s=%20s %4s=%50s %5s=%s\n" \
+    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "dnsmasq" dns "$dns" dpod "$dpod" dcont "$dcont"
-    export mns mpod mcont bns bpod bcont dns dpod dcont
+    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
+        "argora-remote" ans "$ans" apod "$apod" acont "$acont"
+    export mns mpod mcont bns bpod bcont dns dpod dcont ans apod acont
 }
 
 function _kube-logs() {
@@ -51,13 +61,13 @@ function _kube-logs() {
     ns=$1
     pod=$2
     shift 2
-    if [ -z "$KUBECONFIG" ]; then
-        echo "kubectl KUBECONFIG missing, exiting." >&2
+    if [ -z "$U8S_KUBECONFIG" ]; then
+        echo "k KUBECONFIG missing, exiting." >&2
         return 1
     fi
     LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${pod}.log
     trap 'echo -e "\n\n> aborted.\n> logs saved to $LOGFILE"; return' INT
-    kubectl logs $* -n $ns $pod 2>&1 | tee $LOGFILE
+    k logs $* -n $ns $pod 2>&1 | tee $LOGFILE
     [ $? ] && echo -e "\n\n> logs saved to $LOGFILE"
     trap - INT
 }
@@ -71,7 +81,8 @@ function k-metalop-logs() {
 }
 
 function k-save-metalop-logs() {
-    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${KUBECTL_CONTEXT}_${mns}_${mpod}.log
+    u8s_env
+    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${U8S_CONTEXT}_${mns}_${mpod}.log
     metalop-logs >$LOGFILE
     [ $? ] && echo -e "> logs saved to $LOGFILE"
 }
@@ -85,7 +96,8 @@ function k-bootop-logs() {
 }
 
 function k-save-bootop-logs() {
-    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${KUBECTL_CONTEXT}_${bns}_${bpod}.log
+    u8s_env
+    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${U8S_CONTEXT}_${bns}_${bpod}.log
     bootop-logs >$LOGFILE
     [ $? ] && echo -e "> logs saved to $LOGFILE"
 }
