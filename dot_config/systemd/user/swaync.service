@@ -1,0 +1,13 @@
+[Unit]
+Description=SwayNotificationCenter
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/swaync
+ExecStop=kill -9 $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
