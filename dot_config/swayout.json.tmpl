@@ -1,0 +1,127 @@
+{
+    "outputs": [
+        {
+            "name": "intern",
+            "serial": "Unknown",
+            "options": {
+              "mode": "1920x1080"
+            }
+        },
+        {
+            "name": "extern-27",
+            "serial": "FLKQ1L3",
+            "options": {
+                "mode": "2560x1440",
+                "position": "0 0",
+                "transform": "0"
+            }
+        },
+        {
+            "name": "extern-49",
+            "serial": "R9LMAS003894",
+            "options": {
+                "mode": "5120x1440@59.976Hz",
+                "position": "0 0"
+            }
+        }
+    ],
+    "presets": [
+        {
+            "name": "intern",
+            "main": "intern",
+            "outputs": [
+                {
+                    "name": "intern",
+                    "active": true,
+                    "options": {
+                      "position": "0 0"
+                    }
+                },
+                { "name": "extern-27", "active": false },
+                { "name": "extern-49", "active": false }
+            ]
+        },
+        {
+            "name": "extern-49",
+            "main": "extern-49",
+            "outputs": [
+                { "name": "intern", "active": false },
+                {
+                    "name": "extern-49",
+                    "active": true,
+                    "options": {
+                      "position": "0 0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "intern & extern-49",
+            "main": "extern-49",
+            "outputs": [
+                { "name": "intern",
+                    "active": true,
+                    "options": {
+                      "position": "1600 1440"
+                    }
+                },
+                {
+                    "name": "extern-49",
+                    "active": true,
+                    "options": {
+                      "position": "0 0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "extern-27 & extern-49",
+            "main": "extern-49",
+            "outputs": [
+                { "name": "intern",
+                    "active": false
+                },
+                {
+                    "name": "extern-27",
+                    "active": true,
+                    "options": {
+                      "position": "0 0"
+                    }
+                },
+                {
+                    "name": "extern-49",
+                    "active": true,
+                    "options": {
+                      "position": "2560 0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "intern & extern-27 & extern-49",
+            "main": "extern-49",
+            "outputs": [
+                { "name": "intern",
+                    "active": true,
+                    "options": {
+                      "position": "4160 1440"
+                    }
+                },
+                {
+                    "name": "extern-27",
+                    "active": true,
+                    "options": {
+                      "position": "0 0"
+                    }
+                },
+                {
+                    "name": "extern-49",
+                    "active": true,
+                    "options": {
+                      "position": "2560 0"
+                    }
+                }
+            ]
+        }
+    ]
+}
