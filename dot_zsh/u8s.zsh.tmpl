@@ -31,17 +31,17 @@ function u8s_env() {
   u8s env | while IFS='=' read -r k v; do export "$k"="$v"; done
 }
 
-function metal-eval() {
+function eval-metal() {
     u8s_env
     if [ -z "$U8S_KUBECONFIG" ]; then
         echo "kubectl KUBECONFIG missing, exiting." >&2
         return 1
     fi
-    echo ">> metal-eval in $U8S_CONTEXT"
+    echo ">> eval-metal in $U8S_CONTEXT"
     read mns mpod mcont <<<$(k get pods --all-namespaces -o wide | grep 'metal-operator-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
     read bns bpod bcont <<<$(k get pods --all-namespaces -o wide | grep 'boot-operator-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
     read dns dpod dcont <<<$(k get pods --all-namespaces -o wide | grep 'metal-operator-dnsmasq' | grep -v Completed | awk '{print $1, $2, $8}')
-    read ans apod acont <<<$(k get pods --all-namespaces -o wide | grep 'argora-remote-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
+    read ans apod acont <<<$(k get pods --all-namespaces -o wide | grep -e 'argora-remote-controller-manager' -e 'argora-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "metal-operator" mns "$mns" mpod "$mpod" mcont "$mcont"
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
@@ -51,6 +51,39 @@ function metal-eval() {
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "argora-remote" ans "$ans" apod "$apod" acont "$acont"
     export mns mpod mcont bns bpod bcont dns dpod dcont ans apod acont
+}
+
+function env-check() {
+    case $1 in
+        m*)
+            if [ -z "$mns" ] || [ -z "$mpod" ]; then
+                echo "no metal-operator env found, run eval-metal first." >&2
+                return 1
+            fi
+            ;;
+        b*)
+            if [ -z "$bns" ] || [ -z "$bpod" ]; then
+                echo "no boot-operator env found, run eval-metal first." >&2
+                return 1
+            fi
+            ;;
+        d*)
+            if [ -z "$dns" ] || [ -z "$dpod" ]; then
+                echo "no dnsmasq env found, run eval-metal first." >&2
+                return 1
+            fi
+            ;;
+        a*)
+            if [ -z "$ans" ] || [ -z "$apod" ]; then
+                echo "no argora-remote env found, run eval-metal first." >&2
+                return 1
+            fi
+            ;;
+        *)
+            echo "Unknown component prefix: $1, expected m*, b*, d* or a*." >&2
+            return 1
+            ;;
+    esac
 }
 
 function _kube-logs() {
@@ -72,41 +105,34 @@ function _kube-logs() {
     trap - INT
 }
 
-function k-metalop-logs() {
-    if [ -z "$mns" ] || [ -z "$mpod" ]; then
-        echo "metal-eval not run or failed, run metal-eval first." >&2
-        return 1
-    fi
-    _kube-logs $mns $mpod $*
+function kget-logs() {
+    env-check $1 || return 1
+    case $1 in
+        m*)
+            shift 1
+            _kube-logs $mns $mpod $*
+            ;;
+        b*)
+            shift 1
+            _kube-logs $bns $bpod $*
+            ;;
+        d*)
+            shift 1
+            _kube-logs $dns $dpod $*
+            ;;
+        a*)
+            shift 1
+            _kube-logs $ans $apod $*
+            ;;
+        *)
+            echo "Unknown component prefix: $1, expected m*, b*, d* or a*." >&2
+            return 1
+            ;;
+    esac
 }
 
-function k-save-metalop-logs() {
-    u8s_env
-    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${U8S_CONTEXT}_${mns}_${mpod}.log
-    metalop-logs >$LOGFILE
-    [ $? ] && echo -e "> logs saved to $LOGFILE"
-}
-
-function k-bootop-logs() {
-    if [ -z "$bns" ] || [ -z "$bpod" ]; then
-        echo "metal-eval not run or failed, run metal-eval first." >&2
-        return 1
-    fi
-    _kube-logs $bns $bpod $*
-}
-
-function k-save-bootop-logs() {
-    u8s_env
-    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${U8S_CONTEXT}_${bns}_${bpod}.log
-    bootop-logs >$LOGFILE
-    [ $? ] && echo -e "> logs saved to $LOGFILE"
-}
-
-function k-get-leases() {
-    if [ -z "$dns" ] || [ -z "$dpod" ]; then
-        echo "metal-eval not run or failed, run metal-eval first." >&2
-        return 1
-    fi
+function kget-leases() {
+    env-check d || return 1
     echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
     kubectl exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
 }
