@@ -111,8 +111,8 @@ automatically-unhide-macos-hidden-apps = true
     cmd-alt-h = [] # Disable "hide others"
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-    alt-n = 'layout tiles horizontal vertical'
-    alt-m = 'layout accordion horizontal vertical'
+    alt-e = 'layout tiles horizontal vertical'
+    alt-w = 'layout accordion horizontal vertical'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#focus
     alt-h = 'focus --boundaries all-monitors-outer-frame left'
@@ -172,37 +172,37 @@ automatically-unhide-macos-hidden-apps = true
                     'exec-and-forget osascript -e "display notification \"mark a\" with title \"aerospace\""' ]
     alt-ctrl-a = [ 'exec-and-forget aerospace-marks unmark a',
                    'exec-and-forget osascript -e "display notification \"unmark a\" with title \"aerospace\""' ]
-    alt-a = [ 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get a -a)\"" ]
-    # s
-    # # # alt-shift-s = [ 'exec-and-forget aerospace-marks mark s',
-    # # #                 'exec-and-forget osascript -e "display notification \"mark s\" with title \"aerospace\""' ]
-    # # # alt-ctrl-s = [ 'exec-and-forget aerospace-marks unmark s',
-    # # #                'exec-and-forget osascript -e "display notification \"unmark s\" with title \"aerospace\""' ]
-    # # # alt-s = [ 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get s -a)\"" ]
+    alt-a = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get a -a)\" -F window-id=\"$(aerospace-marks get a -i)\""]
+    # s - DO NOT USE, breaks sz
+    # alt-shift-s = [ 'exec-and-forget aerospace-marks mark s',
+    #                 'exec-and-forget osascript -e "display notification \"mark s\" with title \"aerospace\""' ]
+    # alt-ctrl-s = [ 'exec-and-forget aerospace-marks unmark s',
+    #                'exec-and-forget osascript -e "display notification \"unmark s\" with title \"aerospace\""' ]
+    # alt-s = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get s -a)\" -F window-id=\"$(aerospace-marks get s -i)\""]
     # d
     alt-shift-d = [ 'exec-and-forget aerospace-marks mark d',
                     'exec-and-forget osascript -e "display notification \"mark d\" with title \"aerospace\""' ]
     alt-ctrl-d = [ 'exec-and-forget aerospace-marks unmark d',
                    'exec-and-forget osascript -e "display notification \"unmark d\" with title \"aerospace\""' ]
-    alt-d = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get d -a)\"" ]
+    alt-d = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get d -a)\" -F window-id=\"$(aerospace-marks get d -i)\""]
     # z
     alt-shift-z = [ 'exec-and-forget aerospace-marks mark z',
                     'exec-and-forget osascript -e "display notification \"mark z\" with title \"aerospace\""' ]
     alt-ctrl-z = [ 'exec-and-forget aerospace-marks unmark z',
                     'exec-and-forget osascript -e "display notification \"unmark z\" with title \"aerospace\""' ]
-    alt-z = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get z -a)\"" ]
+    alt-z = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get z -a)\" -F window-id=\"$(aerospace-marks get z -i)\""]
     # x
     alt-shift-x = [ 'exec-and-forget aerospace-marks mark x',
                     'exec-and-forget osascript -e "display notification \"mark x\" with title \"aerospace\""' ]
     alt-ctrl-x = [ 'exec-and-forget aerospace-marks unmark x',
                     'exec-and-forget osascript -e "display notification \"unmark x\" with title \"aerospace\""' ]
-    alt-x = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get x -a)\"" ]
+    alt-x = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get x -a)\" -F window-id=\"$(aerospace-marks get x -i)\""]
     # c
     alt-shift-c = [ 'exec-and-forget aerospace-marks mark c',
                     'exec-and-forget osascript -e "display notification \"mark c\" with title \"aerospace\""' ]
     alt-ctrl-c = [ 'exec-and-forget aerospace-marks unmark c',
                     'exec-and-forget osascript -e "display notification \"unmark c\" with title \"aerospace\""' ]
-    alt-c = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get c -a)\"" ]
+    alt-c = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get c -a)\" -F window-id=\"$(aerospace-marks get c -i)\""]
 
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
