@@ -1,5 +1,6 @@
 {
     "outputs": [
+{{- if eq .chezmoi.hostname "silence" -}}
         {
             "name": "intern",
             "serial": "Unknown",
@@ -7,6 +8,7 @@
               "mode": "1920x1080"
             }
         },
+{{- end }}
         {
             "name": "extern-27",
             "serial": "FLKQ1L3",
@@ -26,6 +28,7 @@
         }
     ],
     "presets": [
+{{- if eq .chezmoi.hostname "silence" -}}
         {
             "name": "intern",
             "main": "intern",
@@ -41,6 +44,7 @@
                 { "name": "extern-49", "active": false }
             ]
         },
+{{- end }}
         {
             "name": "extern-49",
             "main": "extern-49",
@@ -55,6 +59,7 @@
                 }
             ]
         },
+{{- if eq .chezmoi.hostname "silence" -}}
         {
             "name": "intern & extern-49",
             "main": "extern-49",
@@ -75,11 +80,14 @@
             ]
         },
         {
-            "name": "extern-27 & extern-49",
+            "name": "intern & extern-27 & extern-49",
             "main": "extern-49",
             "outputs": [
                 { "name": "intern",
-                    "active": false
+                    "active": true,
+                    "options": {
+                      "position": "4160 1440"
+                    }
                 },
                 {
                     "name": "extern-27",
@@ -97,16 +105,41 @@
                 }
             ]
         },
+{{- end }}
         {
-            "name": "intern & extern-27 & extern-49",
+            "name": "extern-27 & [m] extern-49",
             "main": "extern-49",
             "outputs": [
+{{- if eq .chezmoi.hostname "silence" -}}
                 { "name": "intern",
+                    "active": false
+                },
+{{- end }}
+                {
+                    "name": "extern-27",
                     "active": true,
                     "options": {
-                      "position": "4160 1440"
+                      "position": "0 0"
                     }
                 },
+                {
+                    "name": "extern-49",
+                    "active": true,
+                    "options": {
+                      "position": "2560 0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[m] extern-27 & extern-49",
+            "main": "extern-27",
+            "outputs": [
+{{- if eq .chezmoi.hostname "silence" -}}
+                { "name": "intern",
+                    "active": false
+                },
+{{- end }}
                 {
                     "name": "extern-27",
                     "active": true,
