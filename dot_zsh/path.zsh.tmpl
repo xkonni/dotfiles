@@ -1,0 +1,16 @@
+paths=(/usr/local/go/bin $HOME/bin $HOME/.local/bin $HOME/go/bin)
+
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
+paths+="/opt/homebrew/opt/make/libexec/gnubin"
+{{- end }}
+
+for p in ${paths[@]}
+do
+    if [ -d $p ]
+    then
+        if [[ ! $PATH =~ $p ]]
+        then
+            export PATH=$p:$PATH
+        fi
+    fi
+done
