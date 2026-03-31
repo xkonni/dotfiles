@@ -1,7 +1,8 @@
-paths=(/usr/local/go/bin $HOME/bin $HOME/.local/bin $HOME/go/bin)
+paths=(/usr/local/go/bin $HOME/go/bin)
+paths_pre=($HOME/bin $HOME/.local/bin)
 
-{{- if eq .chezmoi.hostname "DNWJGT2PTJ" -}}
-paths+="/opt/homebrew/opt/make/libexec/gnubin"
+{{- if eq .chezmoi.hostname "DNWJGT2PTJ" }}
+paths_pre+="/opt/homebrew/opt/make/libexec/gnubin"
 {{- end }}
 
 for p in ${paths[@]}
@@ -12,5 +13,14 @@ do
         then
             export PATH=$p:$PATH
         fi
+    fi
+done
+
+for p in ${paths_pre[@]}
+do
+    if [ -d $p ]
+    then
+        PATH="${PATH//$p:/}"
+        export PATH=$p:$PATH
     fi
 done
