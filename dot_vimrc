@@ -7,8 +7,8 @@ set encoding=utf-8
 " plug
 source ~/.vim/settings/plug.vim
 
-call tcomment#type#Define('c', '// %s')
-call tcomment#type#Define('cpp', '// %s')
+silent! call tcomment#type#Define('c', '// %s')
+silent! call tcomment#type#Define('cpp', '// %s')
 
 syntax on
 set list
