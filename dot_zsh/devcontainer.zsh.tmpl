@@ -1,0 +1,9 @@
+# vim: ft=zsh
+# to initialize chezmoi in a devcontainer, we need to set the GITHUB_USER env var
+export CHEZMOI_GITHUB_USER=xkonni
+
+{{- if eq .chezmoi.os "darwin" }}
+launchctl setenv CHEZMOI_GITHUB_USER xkonni
+{{- else if eq .chezmoi.os "linux" }}
+systemctl --user set-environment CHEZMOI_GITHUB_USER=xkonni
+{{- end }}
