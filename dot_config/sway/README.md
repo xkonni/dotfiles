@@ -3,7 +3,7 @@
 install required packages
 
 ```
-$ sudo pacman -S sway swayidle swaylock waybar grim slurp swappy wl-clipboard wofi fzf imv playerctl
+$ sudo pacman -S sway hypridle swaylock ironbar grim slurp swappy wl-clipboard wofi fzf
 ```
 
 ![screenshot](sway.png)
