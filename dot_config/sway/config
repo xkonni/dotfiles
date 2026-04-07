@@ -21,7 +21,6 @@ set $brightness_cmd $HOME/.config/sway/bin/sway_brightness
 set $output_cmd $HOME/.local/bin/swayout
 set $volume_cmd $HOME/.config/sway/bin/sway_volume
 set $media_cmd /usr/bin/playerctl
-set $idle_cmd $HOME/.config/sway/bin/start_swayidle.sh
 set $lock_cmd $HOME/.config/sway/bin/sway_lock lock
 set $move_cmd $HOME/.config/sway/bin/sway_move
 set $resize_cmd $HOME/.config/sway/bin/sway_resize
@@ -357,7 +356,6 @@ for_window [app_id="signal"] mark x
 #
 # Autostart
 #
-exec_always $idle_cmd
 exec_always systemctl --user start sway-session.target
 
 include /etc/sway/config.d/*
