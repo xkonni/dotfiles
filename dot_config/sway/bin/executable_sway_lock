@@ -89,23 +89,13 @@ case "$1" in
     _on
     _clean
     ;;
-  screensaver)
-    _screenshot
-    swayidle -w \
-      timeout 5 'swaymsg "output * dpms off"' \
-      resume 'swaymsg "output * dpms on"' &
-    PID=$!
-    _lock
-    _clean
-    kill $PID
-    ;;
   screenshot)
     _on
     _screenshot
     ;;
   *)
     echo "invalid argument \"$1\""
-    echo "arguments: [inhibit [on|off]|lock|lockonly|off|on|screensaver|screenshot]"
+    echo "arguments: [inhibit [on|off]|lock|lockonly|off|on|screenshot]"
 esac
 
 
