@@ -168,40 +168,16 @@ automatically-unhide-macos-hidden-apps = true
 
     # scratchpad
     # a
-    alt-shift-a = [ 'exec-and-forget aerospace-marks mark a',
-                    'exec-and-forget osascript -e "display notification \"mark a\" with title \"aerospace\""' ]
-    alt-ctrl-a = [ 'exec-and-forget aerospace-marks unmark a',
-                   'exec-and-forget osascript -e "display notification \"unmark a\" with title \"aerospace\""' ]
     alt-a = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get a -a)\" -F window-id=\"$(aerospace-marks get a -i)\""]
     # s - DO NOT USE, breaks sz
-    # alt-shift-s = [ 'exec-and-forget aerospace-marks mark s',
-    #                 'exec-and-forget osascript -e "display notification \"mark s\" with title \"aerospace\""' ]
-    # alt-ctrl-s = [ 'exec-and-forget aerospace-marks unmark s',
-    #                'exec-and-forget osascript -e "display notification \"unmark s\" with title \"aerospace\""' ]
     # alt-s = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get s -a)\" -F window-id=\"$(aerospace-marks get s -i)\""]
     # d
-    alt-shift-d = [ 'exec-and-forget aerospace-marks mark d',
-                    'exec-and-forget osascript -e "display notification \"mark d\" with title \"aerospace\""' ]
-    alt-ctrl-d = [ 'exec-and-forget aerospace-marks unmark d',
-                   'exec-and-forget osascript -e "display notification \"unmark d\" with title \"aerospace\""' ]
     alt-d = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get d -a)\" -F window-id=\"$(aerospace-marks get d -i)\""]
     # z
-    alt-shift-z = [ 'exec-and-forget aerospace-marks mark z',
-                    'exec-and-forget osascript -e "display notification \"mark z\" with title \"aerospace\""' ]
-    alt-ctrl-z = [ 'exec-and-forget aerospace-marks unmark z',
-                    'exec-and-forget osascript -e "display notification \"unmark z\" with title \"aerospace\""' ]
     alt-z = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get z -a)\" -F window-id=\"$(aerospace-marks get z -i)\""]
     # x
-    alt-shift-x = [ 'exec-and-forget aerospace-marks mark x',
-                    'exec-and-forget osascript -e "display notification \"mark x\" with title \"aerospace\""' ]
-    alt-ctrl-x = [ 'exec-and-forget aerospace-marks unmark x',
-                    'exec-and-forget osascript -e "display notification \"unmark x\" with title \"aerospace\""' ]
     alt-x = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get x -a)\" -F window-id=\"$(aerospace-marks get x -i)\""]
     # c
-    alt-shift-c = [ 'exec-and-forget aerospace-marks mark c',
-                    'exec-and-forget osascript -e "display notification \"mark c\" with title \"aerospace\""' ]
-    alt-ctrl-c = [ 'exec-and-forget aerospace-marks unmark c',
-                    'exec-and-forget osascript -e "display notification \"unmark c\" with title \"aerospace\""' ]
     alt-c = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get c -a)\" -F window-id=\"$(aerospace-marks get c -i)\""]
 
 
@@ -210,6 +186,8 @@ automatically-unhide-macos-hidden-apps = true
                     'mode service']
     alt-shift-m = [ 'exec-and-forget osascript -e "display notification \"mode moveresize\" with title \"aerospace\""',
                     'mode moveresize' ]
+    alt-shift-comma = [ 'exec-and-forget osascript -e "display notification \"mode scratchpad\" with title \"aerospace\""',
+                    'mode scratchpad' ]
 
 
 # 'service' binding mode declaration.
@@ -230,9 +208,25 @@ automatically-unhide-macos-hidden-apps = true
             'mode main' ]
     tab = 'focus --boundaries-action wrap-around-the-workspace right'
     h = 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"'
+    shift-h = [ 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"',
+                'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"',
+                'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"',
+                'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"' ]
     j = 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"'
+    shift-j = [ 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"',
+                'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"',
+                'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"',
+                'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"' ]
     k = 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"'
+    shift-k = [ 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"',
+                'exec-and-forget open -g "rectangle://execute-action?name=larger-height"',
+                'exec-and-forget open -g "rectangle://execute-action?name=larger-height"',
+                'exec-and-forget open -g "rectangle://execute-action?name=larger-height"' ]
     l = 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"'
+    shift-l = [ 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"',
+                'exec-and-forget open -g "rectangle://execute-action?name=larger-width"',
+                'exec-and-forget open -g "rectangle://execute-action?name=larger-width"',
+                'exec-and-forget open -g "rectangle://execute-action?name=larger-width"' ]
     q = 'exec-and-forget open -g "rectangle://execute-action?name=top-left-sixth"'
     w = 'exec-and-forget open -g "rectangle://execute-action?name=top-center-sixth"'
     e = 'exec-and-forget open -g "rectangle://execute-action?name=top-right-sixth"'
@@ -242,6 +236,35 @@ automatically-unhide-macos-hidden-apps = true
     z = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-left-sixth"'
     x = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-center-sixth"'
     c = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-right-sixth"'
+
+[mode.scratchpad.binding]
+    esc = [ 'exec-and-forget osascript -e "display notification \"mode main\" with title \"aerospace\""',
+            'mode main' ]
+
+    a = [ 'exec-and-forget aerospace-marks mark a',
+          'exec-and-forget osascript -e "display notification \"mark a\" with title \"aerospace\""' ]
+    shift-a = [ 'exec-and-forget aerospace-marks unmark a',
+                'exec-and-forget osascript -e "display notification \"unmark a\" with title \"aerospace\""' ]
+
+    d = [ 'exec-and-forget aerospace-marks mark d',
+          'exec-and-forget osascript -e "display notification \"mark d\" with title \"aerospace\""' ]
+    shift-d = [ 'exec-and-forget aerospace-marks unmark d',
+                'exec-and-forget osascript -e "display notification \"unmark d\" with title \"aerospace\""' ]
+
+    z = [ 'exec-and-forget aerospace-marks mark z',
+          'exec-and-forget osascript -e "display notification \"mark z\" with title \"aerospace\""' ]
+    shift-z = [ 'exec-and-forget aerospace-marks unmark z',
+                'exec-and-forget osascript -e "display notification \"unmark z\" with title \"aerospace\""' ]
+
+    x = [ 'exec-and-forget aerospace-marks mark x',
+          'exec-and-forget osascript -e "display notification \"mark x\" with title \"aerospace\""' ]
+    shift-x = [ 'exec-and-forget aerospace-marks unmark x',
+                'exec-and-forget osascript -e "display notification \"unmark x\" with title \"aerospace\""' ]
+
+    c = [ 'exec-and-forget aerospace-marks mark c',
+          'exec-and-forget osascript -e "display notification \"mark c\" with title \"aerospace\""' ]
+    shift-c = [ 'exec-and-forget aerospace-marks unmark c',
+                'exec-and-forget osascript -e "display notification \"unmark c\" with title \"aerospace\""' ]
 
 [workspace-to-monitor-force-assignment]
     1 = ['PG49WCD','DELL P2723DE',  'DELL C3422WE', 'Built-in Retina Display']
