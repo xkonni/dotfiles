@@ -167,19 +167,21 @@ automatically-unhide-macos-hidden-apps = true
     alt-shift-space = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 
     # scratchpad
-    # a
-    alt-a = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get a -a)\" -F window-id=\"$(aerospace-marks get a -i)\""]
-    # s - DO NOT USE, breaks sz
-    # alt-s = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get s -a)\" -F window-id=\"$(aerospace-marks get s -i)\""]
-    # d
-    alt-d = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get d -a)\" -F window-id=\"$(aerospace-marks get d -i)\""]
-    # z
-    alt-z = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get z -a)\" -F window-id=\"$(aerospace-marks get z -i)\""]
-    # x
-    alt-x = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get x -a)\" -F window-id=\"$(aerospace-marks get x -i)\""]
-    # c
-    alt-c = [ 'focus-monitor DELL C3422WE', 'focus-monitor PG49WCD', "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get c -a)\" -F window-id=\"$(aerospace-marks get c -i)\""]
-
+    alt-a = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get a -a)" -F window-id="$(aerospace-marks get a -i)"' ]
+    alt-d = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get d -a)" -F window-id="$(aerospace-marks get d -i)"' ]
+    alt-z = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get z -a)" -F window-id="$(aerospace-marks get z -i)"' ]
+    alt-x = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get x -a)" -F window-id="$(aerospace-marks get x -i)"' ]
+    alt-c = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get c -a)" -F window-id="$(aerospace-marks get c -i)"' ]
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
     alt-shift-n = [ 'exec-and-forget osascript -e "display notification \"mode service\" with title \"aerospace\""',
@@ -207,26 +209,32 @@ automatically-unhide-macos-hidden-apps = true
     esc = [ 'exec-and-forget osascript -e "display notification \"mode main\" with title \"aerospace\""',
             'mode main' ]
     tab = 'focus --boundaries-action wrap-around-the-workspace right'
+
+    # fine step resize
     h = 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"'
+    j = 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"'
+    k = 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"'
+    l = 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"'
+
+    # larger steps resize
     shift-h = [ 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"',
                 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"',
                 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"',
                 'exec-and-forget open -g "rectangle://execute-action?name=smaller-width"' ]
-    j = 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"'
     shift-j = [ 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"',
                 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"',
                 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"',
                 'exec-and-forget open -g "rectangle://execute-action?name=smaller-height"' ]
-    k = 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"'
     shift-k = [ 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"',
                 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"',
                 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"',
                 'exec-and-forget open -g "rectangle://execute-action?name=larger-height"' ]
-    l = 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"'
     shift-l = [ 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"',
                 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"',
                 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"',
                 'exec-and-forget open -g "rectangle://execute-action?name=larger-width"' ]
+
+    # move presets
     q = 'exec-and-forget open -g "rectangle://execute-action?name=top-left-sixth"'
     w = 'exec-and-forget open -g "rectangle://execute-action?name=top-center-sixth"'
     e = 'exec-and-forget open -g "rectangle://execute-action?name=top-right-sixth"'
@@ -237,11 +245,29 @@ automatically-unhide-macos-hidden-apps = true
     x = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-center-sixth"'
     c = 'exec-and-forget open -g "rectangle://execute-action?name=bottom-right-sixth"'
 
+    # scratchpad
+    alt-a = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get a -a)" -F window-id="$(aerospace-marks get a -i)"' ]
+    alt-d = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get d -a)" -F window-id="$(aerospace-marks get d -i)"' ]
+    alt-z = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get z -a)" -F window-id="$(aerospace-marks get z -i)"' ]
+    alt-x = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get x -a)" -F window-id="$(aerospace-marks get x -i)"' ]
+    alt-c = [ 'focus-monitor DELL C3422WE',
+              'focus-monitor PG49WCD',
+              'exec-and-forget aerospace-scratchpad show "$(aerospace-marks get c -a)" -F window-id="$(aerospace-marks get c -i)"' ]
+
 [mode.scratchpad.binding]
     esc = [ 'exec-and-forget osascript -e "display notification \"mode main\" with title \"aerospace\""',
             'mode main' ]
 
     a = [ 'exec-and-forget aerospace-marks mark a',
+          "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get a -a)\" -F window-id=\"$(aerospace-marks get a -i)\"",
           'exec-and-forget osascript -e "display notification \"mark a\" with title \"aerospace\""' ]
     shift-a = [ 'exec-and-forget aerospace-marks unmark a',
                 'exec-and-forget osascript -e "display notification \"unmark a\" with title \"aerospace\""' ]
@@ -276,7 +302,7 @@ automatically-unhide-macos-hidden-apps = true
     7 = ['Built-in Retina Display']
     8 = ['Built-in Retina Display']
     9 = ['Built-in Retina Display']
-    ".scratchpad" = ['PG49WCD', 'DELL C3422WE', 'Built-in Retina Display']
+    '.scratchpad' = ['PG49WCD', 'DELL C3422WE', 'Built-in Retina Display']
 
 # [[on-window-detected]]
 #     if.app-id = 'com.apple.systempreferences'
