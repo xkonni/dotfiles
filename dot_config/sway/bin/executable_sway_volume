@@ -4,7 +4,6 @@ ICON_PATH=$HOME/.local/share/icons/Tela-circle-dark/16/actions
 NOTIFY_ID=3
 NOTIFY_CMD="notify-send -e -r ${NOTIFY_ID} -a volume -h string:x-swaync-stack-tag:volume"
 APP="pavucontrol"
-SOUND=$HOME/.config/sway/bin/audio-volume-change.oga
 
 # echo -e '\u25cf'
 VOL1="●"
@@ -77,7 +76,6 @@ case $1 in
   # decrease
   d*)
     pactl set-sink-volume $SINK -5%
-    paplay $SOUND &
     notify
     ;;
   # increase
@@ -88,19 +86,16 @@ case $1 in
       INC=5
     fi
     pactl set-sink-volume $SINK +${INC}%
-    paplay $SOUND &
     notify
     ;;
   # mute
   m*)
     pactl set-sink-mute $SINK toggle
-    paplay $SOUND &
     notify
     ;;
   # source-mute
   s*)
     pactl set-source-mute $SOURCE toggle
-    paplay $SOUND &
     notify
     ;;
   # toggle between sinks

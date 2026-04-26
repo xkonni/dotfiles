@@ -23,9 +23,13 @@
   "script-fail-notify": true,
   "text-empty": "No Notification",
   "scripts": {
-    "sound-script": {
+    "volume": {
+      "exec": "paplay ~/.config/swaync/volume.ogg",
+      "app-name": "volume"
+    },
+    "default": {
       "exec": "paplay ~/.config/swaync/notification.ogg",
-      "app-name": ".*"
+      "app-name": "^(?!volume$).*$"
     }
   },
   "widgets": ["title", "buttons-grid", "mpris"],
