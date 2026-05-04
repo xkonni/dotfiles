@@ -55,34 +55,28 @@ else
 fi
 alias ll='ls -l'
 alias lt='ls -ltr'
-alias less='less -F -j4'
+
+# default options for less
+export LESS='-F -j4'
 
 # c -> bat/batcat or cat
 bat=( /usr/bin/bat(N) /usr/bin/batcat(N) /opt/homebrew/bin/bat(N) )
 if type -p ${bat:0:1} &> /dev/null
 then
     BAT_CMD=${bat:0:1}
-    alias c=${BAT_CMD}
-    alias less="${BAT_CMD} --pager='less -RFI -j4'"
-    # bat tail log
-    alias btl="${BAT_CMD} --paging=never -l log"
-    export PAGER=${BAT_CMD}
+    alias c="${BAT_CMD} --paging=never"
     export MANPAGER="sh -c \"col -bx | ${BAT_CMD} -p -l man\""
     export MANROFFOPT="-P -c"
-    # READNULLCMD=$PAGER
-    alias bathelp="${BAT_CMD} --plain --language=help"
     help() {
         "$@" --help 2>&1 | ${BAT_CMD} --plain --language=help
     }
 else
-    BAT_CMD=cat
     alias c=cat
 fi
 
 
 # fd -> fdfind
 fdfind=( /usr/bin/fd(N) /usr/bin/fdfind(N) )
-FD_CMD=""
 if type -p ${fdfind:0:1} &> /dev/null
 then
     FD_CMD=${fdfind:0:1}

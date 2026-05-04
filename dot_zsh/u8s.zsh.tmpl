@@ -16,6 +16,7 @@ alias ke='k exec -ti'
 alias kl='k logs'
 alias klf='k logs -f'
 alias kg='k get'
+alias ky='k get -o yaml'
 alias kga='k get --all-namespaces'
 alias kgm='k get -n metal-servers'
 alias kgp='k get pods -o wide'
@@ -134,6 +135,6 @@ function kget-logs() {
 function kget-leases() {
     env-check d || return 1
     echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
-    kubectl exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
+    k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
 }
 {{- end }}
