@@ -223,7 +223,11 @@
 [oh-my-zsh]
     hide-dirty = 1
     hide-status = 1
-
-[include]
-    path = ~/.gitconfig_extra
-
+{{ if (index . "gitconfig") -}}
+{{- range $section, $opts := .gitconfig }}
+[{{ $section }}]
+{{- range $key, $val := $opts }}
+    {{ $key }} = {{ $val }}
+{{- end }}
+{{ end -}}
+{{- end }}
