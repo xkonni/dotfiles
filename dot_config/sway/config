@@ -187,6 +187,25 @@ bindsym --locked XF86AudioLowerVolume exec $volume_cmd decrease
 bindsym --locked XF86AudioMute exec $volume_cmd mute
 
 #
+## CUT / COPY / PASTE / UNDO
+bindsym XF86Copy exec sh -c '\
+    if [ "$(swaymsg -t get_tree | jq -r ".. | select(.focused? == true).app_id")" = "foot" ]; then \
+        wtype -M ctrl -M shift c -m shift -m ctrl; \
+    else \
+        wtype -M ctrl c -m ctrl; \
+    fi'
+bindsym XF86Paste exec sh -c '\
+    if [ "$(swaymsg -t get_tree | jq -r ".. | select(.focused? == true).app_id")" = "foot" ]; then \
+        wtype -M ctrl -M shift v -m shift -m ctrl; \
+    else \
+        wtype -M ctrl v -m ctrl; \
+    fi'
+bindsym XF86Cut exec wtype -M ctrl x -m ctrl
+bindsym Undo exec wtype -M ctrl z -m ctrl
+bindsym Shift+Undo exec wtype -M ctrl -M shift z -m shift -m ctrl
+
+
+#
 ## Brightness
 #
 bindsym XF86MonBrightnessUp exec $brightness_cmd increase
