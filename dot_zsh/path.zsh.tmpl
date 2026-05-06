@@ -1,7 +1,7 @@
 paths=(/usr/local/go/bin $HOME/go/bin)
 paths_pre=($HOME/bin $HOME/.local/bin)
 
-{{- if eq .chezmoi.hostname "DNWJGT2PTJ" }}
+{{- if eq .chezmoi.os "darwin" }}
 paths_pre+="/opt/homebrew/opt/make/libexec/gnubin"
 {{- end }}
 
