@@ -12,7 +12,6 @@
     text-shadow: none;
     margin: 0;
     padding: 0;
-    color: @srcery-bright-white;
 }
 
 button {
@@ -61,6 +60,8 @@ scale slider {
     margin-left: 4px;
     transition: all 0.5s;
     transition-timing-function: ease;
+    color: @srcery-bright-white;
+}
 
 }
 
