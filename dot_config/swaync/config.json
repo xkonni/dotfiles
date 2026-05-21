@@ -27,9 +27,13 @@
       "exec": "paplay ~/.config/swaync/volume.ogg",
       "app-name": "volume"
     },
+    "sway": {
+      "exec": "paplay ~/.config/swaync/slide.ogg",
+      "app-name": "sway"
+    },
     "default": {
       "exec": "paplay ~/.config/swaync/notification.ogg",
-      "app-name": "^(?!volume$).*$"
+      "app-name": "^(?!(volume|sway)$).*$"
     }
   },
   "widgets": ["title", "buttons-grid", "mpris"],
