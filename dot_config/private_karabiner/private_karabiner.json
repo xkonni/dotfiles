@@ -5,6 +5,7 @@
                 "rules": [
                     {
                         "description": "Map hardware Undo/Copy/Cut/Paste keys to Cmd+Z+C/X/V",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": { "key_code": "undo" },
