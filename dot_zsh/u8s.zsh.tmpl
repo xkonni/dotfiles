@@ -137,4 +137,38 @@ function kget-leases() {
     echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
     k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
 }
+
+function kssh() {
+    if [ $# -lt 1 ]; then
+        echo "Usage: kssh <node> [user] [namespace]" >&2
+        return 1
+    fi
+    local node=$1
+    [[ "$node" != *-system-* ]] && node="${node}-system-0"
+    local user=${2:-metal}
+    local ns=${3:-metal-servers}
+    local secret="${node}-ssh"
+
+    local password pem pub
+    password=$(k get secret -n "$ns" "$secret" -o jsonpath='{.data.password}' 2>/dev/null | base64 -d)
+    pem=$(k get secret -n "$ns" "$secret" -o jsonpath='{.data.pem}' 2>/dev/null | base64 -d)
+    pub=$(k get secret -n "$ns" "$secret" -o jsonpath='{.data.pub}' 2>/dev/null | base64 -d)
+
+    if [ -z "$pem" ]; then
+        echo "Error: secret \"$secret\" not found or has no pem in namespace \"$ns\"" >&2
+        return 1
+    fi
+
+    printf '%s\n' "$pem" > "id_${node}"
+    chmod 600 "id_${node}"
+
+    if [ -n "$pub" ]; then
+        printf '%s\n' "$pub" > "id_${node}.pub"
+        chmod 600 "id_${node}.pub"
+    fi
+
+    echo "password: $password"
+    echo "key written to: id_${node}"
+    [ -n "$pub" ] && echo "pubkey written to: id_${node}.pub"
+}
 {{- end }}
