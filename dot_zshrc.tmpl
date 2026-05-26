@@ -95,7 +95,8 @@ setopt extended_history # save multi-line commands as one command
 setopt hist_reduce_blanks # remove superfluous blanks
 setopt share_history # share history between sessions
 setopt append_history # append to the history file, don't overwrite it
-setopt inc_append_history # add commands to the history file immediately
+# disabled: causes aggressive history trimming when combined with share_history
+# setopt inc_append_history # write history immediately
 setopt hist_verify # show command with history expansion to user before running it
 
 {{ if eq .chezmoi.os "darwin" -}}

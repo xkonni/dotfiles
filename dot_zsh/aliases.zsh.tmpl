@@ -65,6 +65,7 @@ if type -p ${bat:0:1} &> /dev/null
 then
     BAT_CMD=${bat:0:1}
     alias c="${BAT_CMD} --paging=never"
+    alias B="| bat"
     export MANPAGER="sh -c \"col -bx | ${BAT_CMD} -p -l man\""
     export MANROFFOPT="-P -c"
     help() {

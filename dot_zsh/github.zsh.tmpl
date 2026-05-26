@@ -4,7 +4,11 @@
 # - [x] repo
 # - [x] admin:org
 # - [x] project
-export GITHUB_API_TOKEN_COM={{ .github_api_token_com }}
-export GITHUB_API_TOKEN_WDF={{ .github_api_token_wdf }}
-export GITHUB_API_TOKEN_TOOLS={{ .github_api_token_tools }}
+# all GitHub configs defined in [data.github] table in chezmoi.toml will be exported as GITHUB_<NAME>
+
+{{- if (index . "github") }}
+{{- range $name, $value := .github }}
+export GITHUB_{{ upper $name }}={{ $value }}
+{{- end }}
+{{- end }}
 {{- end }}
