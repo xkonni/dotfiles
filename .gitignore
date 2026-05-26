@@ -5,3 +5,4 @@ dot_vim/autoload
 yankring_history_v2.txt
 *.pyc
 *.swp
+private_automatic_backups
