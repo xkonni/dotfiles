@@ -32,6 +32,23 @@ function u8s_env() {
   u8s env | while IFS='=' read -r k v; do export "$k"="$v"; done
 }
 
+function _pick-pod() {
+    local lines
+    lines=$(k get pods --all-namespaces -o wide | grep "$@" | grep -v Completed | awk '{print $1, $2, $8}')
+    [ -z "$lines" ] && return
+    local count=$(echo "$lines" | wc -l | tr -d ' ')
+    if [ "$count" -le 1 ]; then
+        echo "$lines"
+    elif command -v fzf &>/dev/null; then
+        echo "$lines" | fzf --prompt="Select instance> "
+    else
+        local -a choices=("${(@f)lines}")
+        select choice in "${choices[@]}"; do
+            [ -n "$choice" ] && echo "$choice" && break
+        done
+    fi
+}
+
 function eval-metal() {
     u8s_env
     if [ -z "$U8S_KUBECONFIG" ]; then
@@ -39,10 +56,10 @@ function eval-metal() {
         return 1
     fi
     echo ">> eval-metal in $U8S_CONTEXT"
-    read mns mpod mcont <<<$(k get pods --all-namespaces -o wide | grep 'metal-operator-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
-    read bns bpod bcont <<<$(k get pods --all-namespaces -o wide | grep 'boot-operator-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
-    read dns dpod dcont <<<$(k get pods --all-namespaces -o wide | grep 'metal-operator-dnsmasq' | grep -v Completed | awk '{print $1, $2, $8}')
-    read ans apod acont <<<$(k get pods --all-namespaces -o wide | grep -e 'argora-remote-controller-manager' -e 'argora-controller-manager' | grep -v Completed | awk '{print $1, $2, $8}')
+    read mns mpod mcont <<<$(_pick-pod 'metal-operator-controller-manager')
+    read bns bpod bcont <<<$(_pick-pod 'boot-operator-controller-manager')
+    read dns dpod dcont <<<$(_pick-pod 'metal-operator-dnsmasq')
+    read ans apod acont <<<$(_pick-pod -e 'argora-remote-controller-manager' -e 'argora-controller-manager')
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "metal-operator" mns "$mns" mpod "$mpod" mcont "$mcont"
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
