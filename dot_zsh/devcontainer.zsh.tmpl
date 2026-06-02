@@ -2,8 +2,11 @@
 # to initialize chezmoi in a devcontainer, we need to set the GITHUB_USER env var
 export CHEZMOI_GITHUB_USER=xkonni
 
+{{- if env "REMOTE_CONTAINERS" | not }}
+# only set the user env on the host, not in the devcontainer
 {{- if eq .chezmoi.os "darwin" }}
 launchctl setenv CHEZMOI_GITHUB_USER xkonni
 {{- else if eq .chezmoi.os "linux" }}
 systemctl --user set-environment CHEZMOI_GITHUB_USER=xkonni
+{{- end }}
 {{- end }}
