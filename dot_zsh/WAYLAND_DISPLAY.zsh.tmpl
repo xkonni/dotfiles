@@ -1,8 +1,5 @@
 # vim: ft=zsh
-if [[ $(uname) == "Darwin" ]]
-then
-    return 0
-fi
+{{- if and (eq .chezmoi.os "linux") (env "REMOTE_CONTAINERS" | not) }}
 
 LOG=/run/user/$(id -u)/wayland_display.log
 
@@ -63,4 +60,4 @@ then
         wayland_display_load
     fi
 fi
-
+{{- end }}
