@@ -1,7 +1,11 @@
 {{- if eq .chezmoi.os "darwin" -}}
 # vim: ft=zsh
-if type -p helm &> /dev/null
-then
-    source <(helm completion zsh)
+if type -p helm &> /dev/null; then
+  _helm_completion_cache="${XDG_CACHE_HOME:-$HOME/.cache}/helm_completion.zsh"
+  if [[ ! -f "$_helm_completion_cache" ]]; then
+    helm completion zsh >! "$_helm_completion_cache" 2>/dev/null
+  fi
+  [[ -f "$_helm_completion_cache" ]] && source "$_helm_completion_cache"
+  unset _helm_completion_cache
 fi
 {{- end }}

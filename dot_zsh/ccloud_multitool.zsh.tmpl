@@ -5,5 +5,10 @@ function cld {
     . =(ccloud-multitool --ppid $$ --stdout-fd $fd_ccloud "$@")
     exec {fd_ccloud}>&-
 }
-source <(cld completion zsh --prog-name cld)
+_cld_completion_cache="${XDG_CACHE_HOME:-$HOME/.cache}/cld_completion.zsh"
+if [[ ! -f "$_cld_completion_cache" ]]; then
+  cld completion zsh --prog-name cld >! "$_cld_completion_cache" 2>/dev/null
+fi
+[[ -f "$_cld_completion_cache" ]] && source "$_cld_completion_cache"
+unset _cld_completion_cache
 {{- end }}

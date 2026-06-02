@@ -101,7 +101,13 @@ setopt hist_verify # show command with history expansion to user before running 
 
 {{ if eq .chezmoi.os "darwin" -}}
 export OS=Darwin
-eval $(brew shellenv)
+export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+export HOMEBREW_REPOSITORY="/opt/homebrew"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
+fpath[1,0]="/opt/homebrew/share/zsh/site-functions"
+export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
+export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 {{ else if eq .chezmoi.os "linux" -}}
 export OS=Linux
 {{ end -}}
