@@ -60,6 +60,11 @@ then
     alias lt='l -l --sort time --reverse'
 else
     alias l='ls'
+{{- if eq .chezmoi.os "darwin" }}
+    alias l='ls -G'
+{{- else }}
+    alias l='ls --color=auto'
+{{- end }}
     alias lt='l -ltr'
 fi
 alias la='l -a'
