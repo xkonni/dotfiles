@@ -47,14 +47,24 @@ alias zcp='zmv -Cv'
 alias zln='zmv -Lv'
 
 # usability
-if type -p lsd &> /dev/null
+if type -p eza &> /dev/null
 then
-    alias ls='lsd --group-directories-first'
+    alias l='eza --git --group-directories-first --icons --smart-group'
+    alias lt='l -l --sort newest'
+    alias llf='l -lf'                                       # files only, long format
+    alias lld='l -lD'                                       # directories only, long format
+    alias llh='l -l --hyperlink'                            # long format with hyperlink
+elif type -p lsd &> /dev/null
+then
+    alias l='lsd --group-directories-first'
+    alias lt='l -l --sort time --reverse'
 else
-    alias ls='ls --color=auto --group-directories-first'
+    alias l='ls'
+    alias lt='l -ltr'
 fi
-alias ll='ls -l'
-alias lt='ls -ltr'
+alias la='l -a'
+alias ll='l -l'
+alias lla='l -al'
 
 # default options for less
 export LESS='-F -j4'
