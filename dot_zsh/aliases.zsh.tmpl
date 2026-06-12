@@ -79,7 +79,13 @@ bat=( /usr/bin/bat(N) /usr/bin/batcat(N) /opt/homebrew/bin/bat(N) )
 if type -p ${bat:0:1} &> /dev/null
 then
     BAT_CMD=${bat:0:1}
-    alias c="${BAT_CMD} --paging=never"
+    c() {
+        if [[ $# -eq 1 && $1 == *.md ]] && type -p glow &> /dev/null; then
+            glow -w 120 "$1"
+        else
+            ${BAT_CMD} --paging=never "$@"
+        fi
+    }
     alias B="| bat"
     export MANPAGER="sh -c \"col -bx | ${BAT_CMD} -p -l man\""
     export MANROFFOPT="-P -c"
@@ -173,8 +179,10 @@ function WT() {
     local clr=""
     case "$1" in
         -h|--help)
-            echo "Usage: WT [timeout] command..."
-            echo "Runs the specified command repeatedly every [timeout] seconds (default: 2)."
+            echo "Usage: WT [options] command..."
+            echo " -t <timeout>    timeout, default: $timeout"
+            echo " -c              clear, default off"
+            echo "Runs the specified command repeatedly every [timeout] seconds (default: $timeout)."
             return 0
             ;;
         -t)

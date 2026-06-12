@@ -152,7 +152,19 @@ function kget-logs() {
 function kget-leases() {
     env-check d || return 1
     echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
-    k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
+    case $1 in
+        p*)
+            shift 1
+            echo "> ping-check"
+            k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases | while read a b ip c; do
+              echo -en "$ip: "
+              timeout 1 ping -c 1 $ip &> /dev/null && echo yes || echo no
+            done
+            ;;
+        *)
+            k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
+            ;;
+    esac
 }
 
 function kssh() {
@@ -176,16 +188,21 @@ function kssh() {
         return 1
     fi
 
-    printf '%s\n' "$pem" > "id_${node}"
-    chmod 600 "id_${node}"
+    mkdir -p ssh-keys
+    chmod 700 ssh-keys
+    printf '%s\n' "$pem" > "ssh-keys/id_${node}"
+    chmod 600 "ssh-keys/id_${node}"
 
     if [ -n "$pub" ]; then
-        printf '%s\n' "$pub" > "id_${node}.pub"
-        chmod 600 "id_${node}.pub"
+        printf '%s\n' "$pub" > "ssh-keys/id_${node}.pub"
+        chmod 600 "ssh-keys/id_${node}.pub"
     fi
 
     echo "password: $password"
-    echo "key written to: id_${node}"
-    [ -n "$pub" ] && echo "pubkey written to: id_${node}.pub"
+    echo "key written to: ssh-keys/id_${node}"
+    [ -n "$pub" ] && echo "pubkey written to: ssh-keys/id_${node}.pub"
+
+    alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+    echo "alias ssh-$node added, connect with \"ssh-$node <IP_ADDRESS>\""
 }
 {{- end }}
