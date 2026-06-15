@@ -1,0 +1,109 @@
+/* =============================================================
+   THEME: Rosé Pine (dark)
+   ============================================================= */
+
+/* File tree selection */
+span.display-text {
+    background-color: transparent !important;
+}
+.tree-item.selected span.display-text {
+    background-color: #26233a !important;
+    color: #ebbcba !important;
+}
+
+/* -- Editor background & text -- */
+.cm-editor {
+    background-color: #191724 !important;
+    color: #e0def4 !important;
+}
+.cm-scroller {
+    background-color: #191724 !important;
+}
+.cm-content {
+    caret-color: #e0def4 !important;
+}
+
+/* Active line */
+.cm-activeLine {
+    background-color: #1f1d2e !important;
+}
+
+/* Selection */
+.cm-selectionBackground,
+.cm-editor ::selection {
+    background-color: #403d52 !important;
+}
+
+/* -- Headings -- */
+.cm-header-1 { color: #ebbcba !important; }
+.cm-header-2 { color: #c4a7e7 !important; }
+.cm-header-3 { color: #9ccfd8 !important; }
+.cm-header-4 { color: #f6c177 !important; }
+.cm-header-5 { color: #eb6f92 !important; }
+.cm-header-6 { color: #6e6a86 !important; }
+
+/* -- Inline syntax -- */
+.cm-strong        { color: #eb6f92 !important; }
+.cm-emphasis      { color: #c4a7e7 !important; }
+.cm-strikethrough { color: #6e6a86 !important; }
+
+/* Links */
+.cm-link, .cm-url { color: #c4a7e7 !important; }
+
+/* Inline code */
+.cm-monospace {
+    color: #f6c177 !important;
+    background-color: #26233a !important;
+    border-radius: 3px;
+    padding: 0 3px;
+}
+
+/* Code blocks — background on the line, not per token */
+.cm-line:has(.cm-fenced-code) {
+    background-color: #26233a !important;
+}
+.cm-fenced-code {
+    color: #f6c177 !important;
+    background-color: transparent !important;
+}
+
+/* Blockquotes */
+.cm-quote {
+    color: #908caa !important;
+    border-left: 3px solid #ebbcba !important;
+    padding-left: 0.5em;
+}
+
+/* Tags */
+.cm-zkn-tag  { color: #9ccfd8 !important; }
+
+/* Wiki-links */
+.cm-zkn-link { color: #c4a7e7 !important; }
+
+/* Horizontal rules */
+.cm-hr { color: #403d52 !important; }
+
+/* -- UI chrome -- */
+#sidebar,
+#file-manager,
+.sidebar {
+    background-color: #1f1d2e !important;
+    color: #e0def4 !important;
+}
+
+.file-item.active,
+.selected {
+    background-color: #26233a !important;
+    color: #ebbcba !important;
+}
+
+#toolbar,
+.toolbar {
+    background-color: #1f1d2e !important;
+    color: #e0def4 !important;
+}
+
+body.dark {
+    background-color: #191724 !important;
+    color: #e0def4 !important;
+}

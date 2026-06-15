@@ -1,0 +1,151 @@
+/* This catches all */
+.cm-content * {
+    font-family: 'CaskaydiaCove Nerd Font', monospace !important;
+    font-size: 15px !important;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+}
+
+/* Reset headers and selected elements to a non-monospaced system font */
+.cm-fenced-code,
+.cm-codeblock,
+.cm-placeholder,
+.cm-activeLine,
+.cm-line,
+.cm-editor,
+.cm-scroller,
+.cm-content,
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+    font-family: system-ui, -apple-system, sans-serif !important;
+    letter-spacing: normal !important;
+}
+
+/* Adjust sizes so they stand out from the 15px body text */
+.cm-header-1 { font-size: 2.0em !important; }
+.cm-header-2 { font-size: 1.5em !important; }
+.cm-header-3 { font-size: 1.25em !important; }
+/* THEME_START — do not edit this line */
+/* =============================================================
+   THEME: Catppuccin Mocha (dark)
+   ============================================================= */
+
+/* -- Editor background & text -- */
+.cm-editor {
+    background-color: #1e1e2e !important;
+    color: #cdd6f4 !important;
+}
+.cm-scroller {
+    background-color: #1e1e2e !important;
+}
+.cm-content {
+    caret-color: #cdd6f4 !important;
+}
+
+/* Active line */
+.cm-activeLine {
+    background-color: #313244 !important;
+}
+
+/* Selection */
+.cm-selectionBackground,
+.cm-editor ::selection {
+    background-color: #45475a !important;
+}
+
+/* -- Headings -- */
+.cm-header-1 { color: #89b4fa !important; }
+.cm-header-2 { color: #cba6f7 !important; }
+.cm-header-3 { color: #89dceb !important; }
+.cm-header-4 { color: #a6e3a1 !important; }
+.cm-header-5 { color: #fab387 !important; }
+.cm-header-6 { color: #6c7086 !important; }
+
+/* -- Inline syntax -- */
+.cm-strong        { color: #f38ba8 !important; }
+.cm-emphasis      { color: #cba6f7 !important; }
+.cm-strikethrough { color: #6c7086 !important; }
+
+/* Links */
+.cm-link, .cm-url { color: #89b4fa !important; }
+
+/* Inline code */
+.cm-monospace {
+    color: #f38ba8 !important;
+    background-color: transparent !important;
+    border-radius: 3px;
+    padding: 0 3px;
+}
+
+/* Code blocks — background on the line, not per token */
+.cm-line:has(.cm-fenced-code) {
+    background-color: #313244 !important;
+}
+.cm-fenced-code,
+.cm-codeblock {
+    color: #f38ba8 !important;
+    background-color: transparent !important;
+}
+
+/* Blockquotes */
+.cm-quote {
+    color: #9399b2 !important;
+    border-left: 3px solid #89b4fa !important;
+    padding-left: 0.5em;
+}
+
+/* Tags */
+.cm-zkn-tag  { color: #fab387 !important; }
+
+/* Wiki-links */
+.cm-zkn-link { color: #89b4fa !important; }
+
+/* Horizontal rules */
+.cm-hr { color: #45475a !important; }
+
+/* -- UI chrome -- */
+#app,
+#app-wrapper,
+body {
+    background-color: #1e1e2e !important;
+}
+
+#sidebar,
+#file-manager,
+.sidebar,
+.file-list,
+.file-manager,
+.directory-tree,
+[class*="file-manager"],
+[class*="sidebar"] {
+    background-color: #181825 !important;
+    color: #cdd6f4 !important;
+}
+
+.file-item.active,
+.file-item:hover,
+.selected,
+[class*="file-item"].active,
+[class*="is-selected"] {
+    background-color: #313244 !important;
+    color: #89b4fa !important;
+}
+
+#toolbar,
+.toolbar,
+[class*="toolbar"] {
+    background-color: #181825 !important;
+    color: #cdd6f4 !important;
+}
+
+body.dark {
+    background-color: #1e1e2e !important;
+    color: #cdd6f4 !important;
+}
+/* THEME_END — do not edit this line */
