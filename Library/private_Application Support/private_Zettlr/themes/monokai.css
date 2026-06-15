@@ -1,0 +1,122 @@
+/* =============================================================
+   THEME: Monokai (dark)
+   ============================================================= */
+
+/* File tree selection */
+span.display-text {
+    background-color: transparent !important;
+}
+.tree-item.selected span.display-text {
+    background-color: #3e3d32 !important;
+    color: #a6e22e !important;
+}
+
+/* -- Editor background & text -- */
+.cm-editor {
+    background-color: #272822 !important;
+    color: #f8f8f2 !important;
+}
+.cm-scroller {
+    background-color: #272822 !important;
+}
+.cm-content {
+    caret-color: #f8f8f2 !important;
+}
+
+/* Active line */
+.cm-activeLine {
+    background-color: #3e3d32 !important;
+}
+
+/* Selection */
+.cm-selectionBackground,
+.cm-editor ::selection {
+    background-color: #49483e !important;
+}
+
+/* -- Headings -- */
+.cm-header-1 { color: #f92672 !important; }
+.cm-header-2 { color: #66d9e8 !important; }
+.cm-header-3 { color: #a6e22e !important; }
+.cm-header-4 { color: #e6db74 !important; }
+.cm-header-5 { color: #ae81ff !important; }
+.cm-header-6 { color: #75715e !important; }
+
+/* -- Inline syntax -- */
+.cm-strong        { color: #f92672 !important; }
+.cm-emphasis      { color: #ae81ff !important; }
+.cm-strikethrough { color: #75715e !important; }
+
+/* Links */
+.cm-link, .cm-url { color: #66d9e8 !important; }
+
+/* Inline code */
+.cm-monospace {
+    color: #e6db74 !important;
+    background-color: transparent !important;
+    border-radius: 3px;
+    padding: 0 3px;
+}
+
+/* Code blocks */
+.cm-fenced-code,
+.cm-codeblock {
+    color: #e6db74 !important;
+    background-color: transparent !important;
+}
+
+/* Blockquotes */
+.cm-quote {
+    color: #75715e !important;
+    border-left: 3px solid #f92672 !important;
+    padding-left: 0.5em;
+}
+
+/* Tags */
+.cm-zkn-tag  { color: #a6e22e !important; }
+
+/* Wiki-links */
+.cm-zkn-link { color: #66d9e8 !important; }
+
+/* Horizontal rules */
+.cm-hr { color: #49483e !important; }
+
+/* -- UI chrome -- */
+#app,
+#app-wrapper,
+body {
+    background-color: #272822 !important;
+}
+
+#sidebar,
+#file-manager,
+.sidebar,
+.file-list,
+.file-manager,
+.directory-tree,
+[class*="file-manager"],
+[class*="sidebar"] {
+    background-color: #1e1f1c !important;
+    color: #f8f8f2 !important;
+}
+
+.file-item.active,
+.file-item:hover,
+.selected,
+[class*="file-item"].active,
+[class*="is-selected"] {
+    background-color: #3e3d32 !important;
+    color: #a6e22e !important;
+}
+
+#toolbar,
+.toolbar,
+[class*="toolbar"] {
+    background-color: #1e1f1c !important;
+    color: #f8f8f2 !important;
+}
+
+body.dark {
+    background-color: #272822 !important;
+    color: #f8f8f2 !important;
+}

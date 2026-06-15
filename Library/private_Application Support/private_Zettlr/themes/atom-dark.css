@@ -1,0 +1,122 @@
+/* =============================================================
+   THEME: Atom Dark (One Dark)
+   ============================================================= */
+
+/* File tree selection */
+span.display-text {
+    background-color: transparent !important;
+}
+.tree-item.selected span.display-text {
+    background-color: #2c313a !important;
+    color: #61afef !important;
+}
+
+/* -- Editor background & text -- */
+.cm-editor {
+    background-color: #282c34 !important;
+    color: #abb2bf !important;
+}
+.cm-scroller {
+    background-color: #282c34 !important;
+}
+.cm-content {
+    caret-color: #abb2bf !important;
+}
+
+/* Active line */
+.cm-activeLine {
+    background-color: #2c313a !important;
+}
+
+/* Selection */
+.cm-selectionBackground,
+.cm-editor ::selection {
+    background-color: #3e4451 !important;
+}
+
+/* -- Headings -- */
+.cm-header-1 { color: #e06c75 !important; }
+.cm-header-2 { color: #61afef !important; }
+.cm-header-3 { color: #98c379 !important; }
+.cm-header-4 { color: #e5c07b !important; }
+.cm-header-5 { color: #c678dd !important; }
+.cm-header-6 { color: #5c6370 !important; }
+
+/* -- Inline syntax -- */
+.cm-strong        { color: #e06c75 !important; }
+.cm-emphasis      { color: #c678dd !important; }
+.cm-strikethrough { color: #5c6370 !important; }
+
+/* Links */
+.cm-link, .cm-url { color: #61afef !important; }
+
+/* Inline code */
+.cm-monospace {
+    color: #e5c07b !important;
+    background-color: transparent !important;
+    border-radius: 3px;
+    padding: 0 3px;
+}
+
+/* Code blocks */
+.cm-fenced-code,
+.cm-codeblock {
+    color: #e5c07b !important;
+    background-color: transparent !important;
+}
+
+/* Blockquotes */
+.cm-quote {
+    color: #5c6370 !important;
+    border-left: 3px solid #61afef !important;
+    padding-left: 0.5em;
+}
+
+/* Tags */
+.cm-zkn-tag  { color: #98c379 !important; }
+
+/* Wiki-links */
+.cm-zkn-link { color: #61afef !important; }
+
+/* Horizontal rules */
+.cm-hr { color: #3e4451 !important; }
+
+/* -- UI chrome -- */
+#app,
+#app-wrapper,
+body {
+    background-color: #282c34 !important;
+}
+
+#sidebar,
+#file-manager,
+.sidebar,
+.file-list,
+.file-manager,
+.directory-tree,
+[class*="file-manager"],
+[class*="sidebar"] {
+    background-color: #21252b !important;
+    color: #abb2bf !important;
+}
+
+.file-item.active,
+.file-item:hover,
+.selected,
+[class*="file-item"].active,
+[class*="is-selected"] {
+    background-color: #2c313a !important;
+    color: #61afef !important;
+}
+
+#toolbar,
+.toolbar,
+[class*="toolbar"] {
+    background-color: #21252b !important;
+    color: #abb2bf !important;
+}
+
+body.dark {
+    background-color: #282c34 !important;
+    color: #abb2bf !important;
+}
