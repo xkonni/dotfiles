@@ -2,18 +2,18 @@
 {{ if eq .chezmoi.os "darwin" -}}
 SSH_AUTH_SOCK=$(launchctl getenv SSH_AUTH_SOCK)
 {{- else if eq .chezmoi.os "linux" -}}
-SSH_AUTH_SOCK=/run/user/$(id -u)/gcr/ssh
+[[ -z "$SSH_AUTH_SOCK" || ! -e "$SSH_AUTH_SOCK" ]] && SSH_AUTH_SOCK=/run/user/$(id -u)/gcr/ssh
 {{- end }}
 
-# In devcontainer (Docker): fallback to discovering agent socket from mounted ~/.ssh directory
-if [ -f /.dockerenv ]; then
-  if [ -z "$SSH_AUTH_SOCK" ] || [ ! -e "$SSH_AUTH_SOCK" ]; then
-    agent_socket=$(ls -1t ~/.ssh/agent/* 2>/dev/null | head -1)
-    if [ -e "$agent_socket" ]; then
-      SSH_AUTH_SOCK="$agent_socket"
-    fi
+{{ if .devcontainer -}}
+# In devcontainer: fallback to discovering agent socket from mounted ~/.ssh directory
+if [ -z "$SSH_AUTH_SOCK" ] || [ ! -e "$SSH_AUTH_SOCK" ]; then
+  agent_socket=$(ls -1t $HOME/.ssh/agent/* 2>/dev/null | head -1)
+  if [ -e "$agent_socket" ]; then
+    SSH_AUTH_SOCK="$agent_socket"
   fi
 fi
+{{ end -}}
 
 SSH_AUTH_SOCK_FILE=~/.ssh/SSH_AUTH_SOCK
 LOGDIRS=(/run/user/$(id -u) /var/tmp/)
