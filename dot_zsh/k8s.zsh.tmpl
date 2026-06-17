@@ -1,8 +1,9 @@
-{{- if eq .chezmoi.os "darwin" -}}
 # vim: ft=zsh
+{{ if eq .chezmoi.os "darwin" -}}
+if ! command -v u8s >/dev/null 2>&1; then
+  return 0
+fi
 k() { u8s kubectl "$@" }
-compdef k=kubectl
-
 alias kn="u8s set --namespace"
 alias kc="u8s set --context"
 alias kk="u8s set --kubeconfig"
@@ -11,6 +12,18 @@ h() { u8s helm "$@" }
 compdef h=helm
 h3() { u8s helm3 "$@" }
 compdef h3=helm
+
+{{ else if eq .chezmoi.os "linux" }}
+if ! command -v kubectl >/dev/null 2>&1; then
+  return 0
+fi
+k() { kubectl "$@" }
+alias kn="kubectl config set-context --current --namespace"
+alias kc="kubectl config use-context"
+
+{{ end -}}
+
+compdef k=kubectl
 
 alias ke='k exec -ti'
 alias kl='k logs'
@@ -28,6 +41,7 @@ alias -g OY="-o yaml"
 alias -g OYL="-o yaml | bat -l yaml"
 alias -g OW="-o wide"
 
+{{ if eq .chezmoi.os "darwin" -}}
 function u8s_env() {
   u8s env | while IFS='=' read -r k v; do export "$k"="$v"; done
 }
