@@ -181,6 +181,13 @@ function kget-leases() {
     esac
 }
 
+function kping() {
+    for i in $*
+    do
+        echo i $i
+    done
+}
+
 function kssh() {
     if [ $# -lt 1 ]; then
         echo "Usage: kssh <node> [user] [namespace]" >&2
