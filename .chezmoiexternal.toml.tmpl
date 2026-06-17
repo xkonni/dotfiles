@@ -26,8 +26,7 @@
     type = "file"
     url = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
     refreshPeriod = "168h"
-{{- $codespaces := env "CODESPACES" | not | not -}}
-{{- if and (not .devcontainer) (not $codespaces) -}}
+{{- if and (not .devcontainer) (not .codespaces) -}}
 {{-   $fontDir := ".local/share/fonts" }}
 {{-   if eq .chezmoi.os "darwin" }}
 {{-     $fontDir = "Library/Fonts" }}
