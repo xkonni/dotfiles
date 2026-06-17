@@ -174,35 +174,28 @@ function PSA() {
 
 # WATCH
 function WT() {
-    local timeout=10
-    local count=1
-    local clr=""
-    case "$1" in
-        -h|--help)
-            echo "Usage: WT [options] command..."
-            echo " -t <timeout>    timeout, default: $timeout"
-            echo " -c              clear, default off"
-            echo "Runs the specified command repeatedly every [timeout] seconds (default: $timeout)."
-            return 0
-            ;;
-        -t)
-            timeout=$2
-            shift 2
-            ;;
-        -c)
-            clr=true
-            shift 1
-            ;;
-    esac
+    local timeout=10 clr
+    local -a clr_opt timeout_opt help_opt
 
+    zparseopts -D -E -- \
+        c=clr_opt       \
+        t:=timeout_opt  \
+        h=help_opt      \
+        -help=help_opt  \
+    || return 1
+    [[ $1 == -- ]] && shift
+
+    (( $#help_opt    )) && { echo "Usage: WT [-c] [-t timeout] command..."; return 0 }
+    (( $#clr_opt     )) && clr=true
+    (( $#timeout_opt )) && timeout=${timeout_opt[2]}
+
+    local count=1
     while true; do
+        [[ -n $clr ]] && clear
         echo -e "\n>> [$(date '+%Y-%m-%d %H:%M:%S')] [$count] $*"
         eval "$@"
         let count+=1
         sleep $timeout
-        if [[ -n $clr ]]; then
-            clear
-        fi
     done
 }
 
