@@ -13,8 +13,12 @@ set -g status-keys vi
 # Use vi keybindings in copy and choice modes
 setw -g mode-keys vi
 
-# mouse on
+# mouse on (off in devcontainer — mouse copy path mangles UTF-8 glyphs)
+{{ if .devcontainer -}}
+set -g mouse off
+{{- else -}}
 set -g mouse on
+{{- end }}
 
 # No escape time for vi mode
 set -sg escape-time 200
