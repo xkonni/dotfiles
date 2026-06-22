@@ -85,6 +85,8 @@
 {{ end }}
     cam = commit --amend              # ammend your last commit
     caam = commit -a --amend          # ammend all to your last commit
+    resign = !git log -1 --format=%B | sed '/^Signed-off-by:/d' | git commit --amend --reset-author --signoff --cleanup=strip -F -
+
     # uncommit
     uncommit = reset HEAD^
 
