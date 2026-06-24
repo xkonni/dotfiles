@@ -165,26 +165,38 @@ function kget-logs() {
 
 function kget-leases() {
     env-check d || return 1
+    local do_ping=0 filter=
+    while [[ $1 == -* ]]; do
+        case $1 in
+            -p) do_ping=1; shift ;;
+            -l) filter=$2; shift 2 ;;
+            *) break ;;
+        esac
+    done
     echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
-    case $1 in
-        p*)
-            shift 1
-            echo "> ping-check"
-            k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases | while read a b ip c; do
-              echo -en "$ip: "
-              timeout 1 ping -c 1 $ip &> /dev/null && echo yes || echo no
-            done
-            ;;
-        *)
-            k exec -it -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases
-            ;;
-    esac
+    if (( do_ping )); then
+        k exec -i -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases \
+            | { [[ -n $filter ]] && grep "$filter" || cat; } | kping
+    else
+        k exec -i -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases \
+            | { [[ -n $filter ]] && grep "$filter" || cat; }
+    fi
+}
+
+function ksecret() {
+    if [ $# -lt 1 ]; then
+        echo "Usage: ksecret <secret> [namespace]" >&2
+        return 1
+    fi
+    local secret=$1
+    local ns=${2:-metal-servers}
+    k get secret -n "$ns" "$secret" -o json | jq -r '.data | to_entries[] | "=== \(.key) ===\n\(.value | @base64d)\n"'
 }
 
 function kping() {
-    for i in $*
-    do
-        echo i $i
+    while read -r _ _ ip _; do
+        echo -en "$ip: "
+        timeout 1 ping -c 1 $ip &>/dev/null && echo yes || echo no
     done
 }
 
