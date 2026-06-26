@@ -42,7 +42,7 @@ alias -g OYL="-o yaml | bat -l yaml"
 alias -g OW="-o wide"
 
 {{ if eq .chezmoi.os "darwin" -}}
-function u8s_env() {
+function _u8s_env() {
   u8s env | while IFS='=' read -r k v; do export "$k"="$v"; done
 }
 
@@ -63,8 +63,8 @@ function _pick-pod() {
     fi
 }
 
-function eval-metal() {
-    u8s_env
+function _eval-metal() {
+    _u8s_env
     if [ -z "$U8S_KUBECONFIG" ]; then
         echo "kubectl KUBECONFIG missing, exiting." >&2
         return 1
@@ -85,7 +85,7 @@ function eval-metal() {
     export mns mpod mcont bns bpod bcont dns dpod dcont ans apod acont
 }
 
-function env-check() {
+function _env-check() {
     case $1 in
         m*)
             if [ -z "$mns" ] || [ -z "$mpod" ]; then
@@ -137,105 +137,101 @@ function _kube-logs() {
     trap - INT
 }
 
-function kget-logs() {
-    env-check $1 || return 1
-    case $1 in
-        m*)
-            shift 1
-            _kube-logs $mns $mpod $*
+function kkg() {
+    local action=$1; shift
+    case $action in
+        logs)
+            _env-check $1 || return 1
+            local comp=$1; shift
+            case $comp in
+                m*) _kube-logs $mns $mpod "$@" ;;
+                b*) _kube-logs $bns $bpod "$@" ;;
+                d*) _kube-logs $dns $dpod "$@" ;;
+                a*) _kube-logs $ans $apod "$@" ;;
+                *) echo "Unknown component prefix: $comp" >&2; return 1 ;;
+            esac
             ;;
-        b*)
-            shift 1
-            _kube-logs $bns $bpod $*
+        leases)
+            _env-check d || return 1
+            local do_ping=0 filter=
+            while [[ $1 == -* ]]; do
+                case $1 in
+                    -p) do_ping=1; shift ;;
+                    -l) filter=$2; shift 2 ;;
+                    *) break ;;
+                esac
+            done
+            echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
+            local raw
+            raw=$(k exec -i -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases \
+                | { [[ -n $filter ]] && grep "$filter" || cat; })
+            local -A mac_ips
+            while read -r _ mac ip _; do
+                [[ -n $mac && -n $ip ]] || continue
+                mac_ips[$mac]+="$ip "
+            done <<< "$raw"
+            for mac in ${(ko)mac_ips}; do
+                echo "- $mac"
+                for ip in ${=mac_ips[$mac]}; do
+                    if (( do_ping )); then
+                        timeout 0.5 ping -c 1 $ip &>/dev/null && echo "  - $ip · YES" || echo "  - $ip · no"
+                    else
+                        echo "  - $ip"
+                    fi
+                done
+            done
             ;;
-        d*)
-            shift 1
-            _kube-logs $dns $dpod $*
+        secret)
+            if [[ $# -lt 1 ]]; then
+                echo "Usage: $0 secret [-r] <secret> [namespace]" >&2; return 1
+            fi
+            local raw=0; [[ $1 == -r ]] && { raw=1; shift }
+            local secret=$1 ns=${2:-metal-servers}
+            local json
+            json=$(k get secret -n "$ns" "$secret" -o json 2>/dev/null)
+            if [[ -z $json && $secret != *-system-* ]]; then
+                json=$(k get secret -n "$ns" "${secret}-system-0" -o json 2>/dev/null)
+            fi
+            [[ -z $json ]] && { echo "Error: secret \"$secret\" not found in namespace \"$ns\"" >&2; return 1 }
+            if (( raw )); then
+                jq -r '.data | to_entries[] | "\(.key)\t\(.value)"' <<< "$json"
+            else
+                jq -r '.data | to_entries[] | "=== \(.key) ===\n\(.value | @base64d)\n"' <<< "$json"
+            fi
             ;;
-        a*)
-            shift 1
-            _kube-logs $ans $apod $*
+        ssh)
+            if [[ $# -lt 1 ]]; then
+                echo "Usage: $0 ssh <node> [user] [namespace]" >&2; return 1
+            fi
+            local node=$1
+            [[ "$node" != *-system-* ]] && node="${node}-system-0"
+            local user=${2:-metal} ns=${3:-metal-servers}
+            mkdir -p ssh-keys && chmod 700 ssh-keys
+            local key b64 value
+            while IFS=$'\t' read -r key b64; do
+                value=$(base64 -d <<< "$b64")
+                case $key in
+                    pem) printf '%s\n' "$value" > "ssh-keys/id_${node}"; chmod 600 "ssh-keys/id_${node}"; echo "pem: ssh-keys/id_${node}" ;;
+                    pub) printf '%s\n' "$value" > "ssh-keys/id_${node}.pub"; chmod 600 "ssh-keys/id_${node}.pub"; echo "pub: ssh-keys/id_${node}.pub" ;;
+                    *)   echo "$key: $value" ;;
+                esac
+            done < <($0 secret -r "${node}-ssh" "$ns")
+            alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+            echo "alias: ssh-$node <IP>"
+            ;;
+        eval)
+            _eval-metal
             ;;
         *)
-            echo "Unknown component prefix: $1, expected m*, b*, d* or a*." >&2
-            return 1
+            echo "Usage: $0 <eval|leases|logs|secret|ssh> [args...]" >&2; return 1
             ;;
     esac
-}
-
-function kget-leases() {
-    env-check d || return 1
-    local do_ping=0 filter=
-    while [[ $1 == -* ]]; do
-        case $1 in
-            -p) do_ping=1; shift ;;
-            -l) filter=$2; shift 2 ;;
-            *) break ;;
-        esac
-    done
-    echo "> leases from ns: \"$dns\" pod: \"$dpod\" /var/lib/misc/dnsmasq.leases:"
-    if (( do_ping )); then
-        k exec -i -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases \
-            | { [[ -n $filter ]] && grep "$filter" || cat; } | kping
-    else
-        k exec -i -n $dns $dpod -- cat /var/lib/misc/dnsmasq.leases \
-            | { [[ -n $filter ]] && grep "$filter" || cat; }
-    fi
-}
-
-function ksecret() {
-    if [ $# -lt 1 ]; then
-        echo "Usage: ksecret <secret> [namespace]" >&2
-        return 1
-    fi
-    local secret=$1
-    local ns=${2:-metal-servers}
-    k get secret -n "$ns" "$secret" -o json | jq -r '.data | to_entries[] | "=== \(.key) ===\n\(.value | @base64d)\n"'
 }
 
 function kping() {
     while read -r _ _ ip _; do
         echo -en "$ip: "
-        timeout 1 ping -c 1 $ip &>/dev/null && echo yes || echo no
+        timeout 0.5 ping -c 1 $ip &>/dev/null && echo yes || echo no
     done
-}
-
-function kssh() {
-    if [ $# -lt 1 ]; then
-        echo "Usage: kssh <node> [user] [namespace]" >&2
-        return 1
-    fi
-    local node=$1
-    [[ "$node" != *-system-* ]] && node="${node}-system-0"
-    local user=${2:-metal}
-    local ns=${3:-metal-servers}
-    local secret="${node}-ssh"
-
-    local password pem pub
-    password=$(k get secret -n "$ns" "$secret" -o jsonpath='{.data.password}' 2>/dev/null | base64 -d)
-    pem=$(k get secret -n "$ns" "$secret" -o jsonpath='{.data.pem}' 2>/dev/null | base64 -d)
-    pub=$(k get secret -n "$ns" "$secret" -o jsonpath='{.data.pub}' 2>/dev/null | base64 -d)
-
-    if [ -z "$pem" ]; then
-        echo "Error: secret \"$secret\" not found or has no pem in namespace \"$ns\"" >&2
-        return 1
-    fi
-
-    mkdir -p ssh-keys
-    chmod 700 ssh-keys
-    printf '%s\n' "$pem" > "ssh-keys/id_${node}"
-    chmod 600 "ssh-keys/id_${node}"
-
-    if [ -n "$pub" ]; then
-        printf '%s\n' "$pub" > "ssh-keys/id_${node}.pub"
-        chmod 600 "ssh-keys/id_${node}.pub"
-    fi
-
-    echo "password: $password"
-    echo "key written to: ssh-keys/id_${node}"
-    [ -n "$pub" ] && echo "pubkey written to: ssh-keys/id_${node}.pub"
-
-    alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-    echo "alias ssh-$node added, connect with \"ssh-$node <IP_ADDRESS>\""
 }
 {{- end }}
