@@ -103,10 +103,11 @@
     last = diff HEAD^                 # diff last committed change
 
     # log
-    l  = log --graph --date=short -n 10
-    ll = log --graph --date=short
-    lf = log --graph --date=short -n 5 --pretty=format:\"%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b\"
-    llf = log --graph --date=short --pretty=format:\"%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b\"
+    l  = log --graph --date=short -n 10 --format=\"%C(33)%ad%Creset %C(136)%h%C(70)%d%Creset %C(33)%s %C(162) [%an]%Creset\"
+    ll = log --graph --date=short --format=\"%C(33)%ad%Creset %C(136)%h%C(70)%d%Creset %C(33)%s %C(162) [%an]%Creset\"
+    lf = log --graph --date=short -n 1
+    llf = log --graph --date=short -n 5
+    lllf = log --graph --date=short
     changes = log --pretty=format:\"%h %cr %cn %C70%s%Creset\" --name-status
     short = log --pretty=format:\"%h %cr %cn %C70%s%Creset\"
     simple = log --pretty=format:\" * %s\"
@@ -167,7 +168,7 @@
     rv = !git push origin +$(git rev-parse --abbrev-ref HEAD)
 
 [format]
-    pretty = format:%C(33)%ad%Creset %C(136)%h%C(70)%d%Creset %C(33)%s %C(162) [%an]%Creset
+    pretty = format:\"%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b\"
 
 [mergetool]
     prompt = false
