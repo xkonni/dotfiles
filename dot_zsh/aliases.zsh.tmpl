@@ -19,6 +19,7 @@ alias cmu='chezmoi update'
 alias gl='git log --graph --date=short -n 10'
 alias gll='git log --graph --date=short'
 alias glf='git log --graph --date=short -n 5 --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
+alias glfp='git log --graph --date=short -n 1 --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
 alias gllf='git log --graph --date=short --pretty="format:%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b"'
 alias glp='git log --date=short -n 1 --patch'
 alias gllp='git log --date=short -n 5 --patch'
@@ -120,12 +121,12 @@ then
 fi
 
 # global aliases
-alias -g G='| grep '
-alias -g GI='| grep -i '
-alias -g GV='| grep -v '
-alias -g GVI='| grep -vi '
-alias -g GC='| grep -c  '
-alias -g GCI='| grep -ci  '
+alias -g G='| grep -E '
+alias -g GI='| grep -Ei '
+alias -g GV='| grep -Ev '
+alias -g GVI='| grep -Evi '
+alias -g GC='| grep -Ec  '
+alias -g GCI='| grep -Eci  '
 alias -g L='| less'
 alias -g LP='| less -l patch'
 alias -g LY='| jless --yaml'
@@ -191,8 +192,8 @@ function WT() {
 
     local count=1
     while true; do
-        [[ -n $clr ]] && clear
-        echo -e "\n>> [$(date '+%Y-%m-%d %H:%M:%S')] [$count] $*"
+        [[ -n $clr ]] && clear >/dev/tty
+        echo -e "\n>> [$(date '+%Y-%m-%d %H:%M:%S')] [$count] $*" >/dev/tty
         eval "$@"
         let count+=1
         sleep $timeout
