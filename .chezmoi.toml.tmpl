@@ -1,5 +1,9 @@
 {{- $devcontainer := or (stat "/.dockerenv" | not | not) (env "REMOTE_CONTAINERS" | not | not) -}}
 {{- $codespaces := env "CODESPACES" | not | not -}}
+{{- $name := promptStringOnce . "name" "Git name" -}}
+{{- $email := promptStringOnce . "email" "Git email" -}}
 [data]
     devcontainer = {{ $devcontainer }}
     codespaces = {{ $codespaces }}
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
