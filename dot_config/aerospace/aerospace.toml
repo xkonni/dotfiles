@@ -283,18 +283,12 @@ automatically-unhide-macos-hidden-apps = true
     esc = [ 'exec-and-forget osascript -e "display notification \"mode main\" with title \"aerospace\""',
             'mode main' ]
 
-    # s disabled: option+s = ß on macOS ABC layout, cannot be overridden
-    # s = [ 'exec-and-forget aerospace-marks mark s',
-    #       "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get s -a)\" -F window-id=\"$(aerospace-marks get s -i)\"",
-    #       'exec-and-forget osascript -e "display notification \"mark s\" with title \"aerospace\""' ]
-    # shift-s = [ 'exec-and-forget aerospace-marks unmark s',
-    #             'exec-and-forget osascript -e "display notification \"unmark s\" with title \"aerospace\""' ]
-
-    a = [ 'exec-and-forget aerospace-marks mark s',
+    s = [ 'exec-and-forget aerospace-marks mark s',
           "exec-and-forget aerospace-scratchpad show \"$(aerospace-marks get s -a)\" -F window-id=\"$(aerospace-marks get s -i)\"",
           'exec-and-forget osascript -e "display notification \"mark s\" with title \"aerospace\""' ]
-    shift-a = [ 'exec-and-forget aerospace-marks unmark s',
+    shift-s = [ 'exec-and-forget aerospace-marks unmark s',
                 'exec-and-forget osascript -e "display notification \"unmark s\" with title \"aerospace\""' ]
+
 
     d = [ 'exec-and-forget aerospace-marks mark d',
           'exec-and-forget osascript -e "display notification \"mark d\" with title \"aerospace\""' ]
