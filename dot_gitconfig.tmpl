@@ -76,12 +76,13 @@
     b = branch -v                     # branch (verbose)
 
     # commit
-{{ if eq .chezmoi.os "darwin" }}
-    c = commit -s -m                   # commit with message (signed-off)
-    ca = commit -s -am                 # commit all with message (signed-off)
+{{ if or (eq .chezmoi.os "darwin") .devcontainer }}
+    commit = commit -s                # commit (signed-off)
+    c = commit -s -m                  # commit with message (signed-off)
+    ca = commit -s -am                # commit all with message (signed-off)
 {{ else }}
-    c = commit -m                      # commit with message
-    ca = commit -am                    # commit all with message
+    c = commit -m                     # commit with message
+    ca = commit -am                   # commit all with message
 {{ end }}
     cam = commit --amend              # ammend your last commit
     caam = commit -a --amend          # ammend all to your last commit
