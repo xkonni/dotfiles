@@ -175,25 +175,26 @@ function PSA() {
 
 # WATCH
 function WT() {
-    local timeout=10 clr
-    local -a clr_opt timeout_opt help_opt
+    local timeout=10 append
+    local -a append_opt timeout_opt help_opt
 
     zparseopts -D -E -- \
-        c=clr_opt       \
+        a=append_opt       \
         t:=timeout_opt  \
         h=help_opt      \
         -help=help_opt  \
     || return 1
     [[ $1 == -- ]] && shift
 
-    (( $#help_opt    )) && { echo "Usage: WT [-c] [-t timeout] command..."; return 0 }
-    (( $#clr_opt     )) && clr=true
+    (( $#help_opt    )) && { echo "Usage: WT [-a] [-t timeout] command..."; return 0 }
+    (( $#append_opt     )) && append=true
     (( $#timeout_opt )) && timeout=${timeout_opt[2]}
 
+    local m=$'%F{magenta}' c=$'%F{cyan}' r=$'%f'
     local count=1
     while true; do
-        [[ -n $clr ]] && clear >/dev/tty
-        echo -e "\n>> [$(date '+%Y-%m-%d %H:%M:%S')] [$count] $*" >/dev/tty
+        [[ -z $append ]] && clear >/dev/tty
+        print -P "\n${m}>>[${r}$(date '+%Y-%m-%d') $(date '+%H:%M:%S')${m} :: ${r}${count}x (${timeout}s)${m}] ${c}$*${r}" >/dev/tty
         eval "$@"
         let count+=1
         sleep $timeout
@@ -213,6 +214,6 @@ zle -N globalias
 # bindkey "^ " magic-space              # control-space to bypass completion
 bindkey -M emacs "^ " globalias                 # space key to expand globalalias
 bindkey -M viins "^ " globalias                 # space key to expand globalalias
-bindkey -M emacs " " magic-space              # control-space to bypass completion
+bindkey -M emacs " " magic-space              # control-space to bypass comp$letion
 bindkey -M viins " " magic-space              # control-space to bypass completion
 bindkey -M isearch " " magic-space    # normal space during searches

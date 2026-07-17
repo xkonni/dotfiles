@@ -1,5 +1,5 @@
-paths=(/usr/local/go/bin $HOME/go/bin)
-paths_pre=($HOME/bin $HOME/.local/bin)
+paths=(/usr/local/go/bin)
+paths_pre=($HOME/bin $HOME/.local/bin $HOME/go/bin)
 
 {{- if eq .chezmoi.os "darwin" }}
 paths_pre+="/opt/homebrew/opt/make/libexec/gnubin"
