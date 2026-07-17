@@ -152,11 +152,9 @@ bindsym $alt+u [urgent=latest] focus
 #
 # Layout stuff:
 #
-# You can "split" the current object of your focus with
-# $alt+b or $alt+v, for horizontal and vertical splits
-# respectively.
-bindsym $alt+b splith
-bindsym $alt+v splitv
+# You can "split" horizontally and vertically
+bindsym $alt+g splith
+bindsym $alt+b splitv
 
 # Switch the current container between different layout styles
 bindsym $alt+q layout stacking
@@ -164,7 +162,7 @@ bindsym $alt+w layout tabbed
 bindsym $alt+e layout toggle split
 
 # Make the current focus fullscreen
-bindsym $alt+f fullscreen
+bindsym $alt+shift+f fullscreen
 
 # Toggle the current focus between tiling and floating mode
 bindsym $alt+Shift+space floating toggle
@@ -251,26 +249,26 @@ bindsym $alt+Shift+s move scratchpad
 # Show all scratchpads
 bindsym $alt+Ctrl+s scratchpad show
 # Show specific scratchpads
-bindsym $alt+a [con_mark="a" tiling=True] focus; [con_mark="a" floating=True] focus output $$main; \
-    [con_mark="a" floating=True] scratchpad show;
 bindsym $alt+s [con_mark="s" tiling=True] focus; [con_mark="s" floating=True] focus output $$main; \
     [con_mark="s" floating=True] scratchpad show;
 bindsym $alt+d [con_mark="d" tiling=True] focus; [con_mark="d" floating=True] focus output $$main; \
     [con_mark="d" floating=True] scratchpad show;
-bindsym $alt+z [con_mark="z" tiling=True] focus; [con_mark="z" floating=True] focus output $$main; \
-    [con_mark="z" floating=True] scratchpad show;
+bindsym $alt+f [con_mark="f" tiling=True] focus; [con_mark="f" floating=True] focus output $$main; \
+    [con_mark="f" floating=True] scratchpad show;
 bindsym $alt+x [con_mark="x" tiling=True] focus; [con_mark="x" floating=True] focus output $$main; \
     [con_mark="x" floating=True] scratchpad show;
 bindsym $alt+c [con_mark="c" tiling=True] focus; [con_mark="c" floating=True] focus output $$main; \
     [con_mark="c" floating=True] scratchpad show;
+bindsym $alt+v [con_mark="v" tiling=True] focus; [con_mark="v" floating=True] focus output $$main; \
+    [con_mark="v" floating=True] scratchpad show;
 bindsym $alt+Shift+u exec notify-send $$main
 
 #
 # Notifications
 #
-bindsym $alt+comma exec swaync-client --close-latest
-bindsym $alt+Shift+comma exec swaync-client --close-all
 bindsym $alt+period exec swaync-client --toggle-panel
+bindsym $alt+Shift+period exec swaync-client --close-latest
+bindsym $alt+Control+Shift+period exec swaync-client --close-all
 
 #
 # Modes
@@ -286,25 +284,25 @@ mode "move" {
     bindsym Shift+$up move up 100px
     bindsym Shift+$right move right 100px
     # edges
-    bindsym q exec $move_cmd top-left
-    bindsym w exec $move_cmd top-center
-    bindsym e exec $move_cmd top-right
-    bindsym a exec $move_cmd center-left
-    bindsym s exec $move_cmd center-center
-    bindsym d exec $move_cmd center-right
-    bindsym z exec $move_cmd bottom-left
-    bindsym x exec $move_cmd bottom-center
-    bindsym c exec $move_cmd bottom-right
+    bindsym w exec $move_cmd top-left
+    bindsym e exec $move_cmd top-center
+    bindsym r exec $move_cmd top-right
+    bindsym s exec $move_cmd center-left
+    bindsym d exec $move_cmd center-center
+    bindsym f exec $move_cmd center-right
+    bindsym x exec $move_cmd bottom-left
+    bindsym c exec $move_cmd bottom-center
+    bindsym v exec $move_cmd bottom-right
     # edge + resize
-    bindsym Shift+q exec $move_cmd top-left     ; exec $resize_cmd 70
-    bindsym Shift+w exec $move_cmd top-center   ; exec $resize_cmd 70
-    bindsym Shift+e exec $move_cmd top-right    ; exec $resize_cmd 70
-    bindsym Shift+a exec $move_cmd center-left  ; exec $resize_cmd 60
-    bindsym Shift+s exec $move_cmd center-center; exec $resize_cmd 60
-    bindsym Shift+d exec $move_cmd center-right ; exec $resize_cmd 60
-    bindsym Shift+z exec $move_cmd bottom-left  ; exec $resize_cmd 80
-    bindsym Shift+x exec $move_cmd bottom-center; exec $resize_cmd 80
-    bindsym Shift+c exec $move_cmd bottom-right ; exec $resize_cmd 80
+    bindsym Shift+w exec $move_cmd top-left     ; exec $resize_cmd 70
+    bindsym Shift+e exec $move_cmd top-center   ; exec $resize_cmd 70
+    bindsym Shift+r exec $move_cmd top-right    ; exec $resize_cmd 70
+    bindsym Shift+s exec $move_cmd center-left  ; exec $resize_cmd 60
+    bindsym Shift+d exec $move_cmd center-center; exec $resize_cmd 60
+    bindsym Shift+f exec $move_cmd center-right ; exec $resize_cmd 60
+    bindsym Shift+x exec $move_cmd bottom-left  ; exec $resize_cmd 80
+    bindsym Shift+c exec $move_cmd bottom-center; exec $resize_cmd 80
+    bindsym Shift+v exec $move_cmd bottom-right ; exec $resize_cmd 80
     # resize presets
     bindsym 1 exec $resize_cmd 20
     bindsym 2 exec $resize_cmd 40
@@ -321,12 +319,12 @@ mode "move" {
     bindsym Escape exec $notify_cmd "mode: default"; mode "default"
 }
 mode "mark" {
-    bindsym a exec $notify_cmd "mode: mark a"; mark a
     bindsym s exec $notify_cmd "mode: mark s"; mark s
     bindsym d exec $notify_cmd "mode: mark d"; mark d
-    bindsym z exec $notify_cmd "mode: mark z"; mark z
+    bindsym f exec $notify_cmd "mode: mark f"; mark f
     bindsym x exec $notify_cmd "mode: mark x"; mark x
     bindsym c exec $notify_cmd "mode: mark c"; mark c
+    bindsym v exec $notify_cmd "mode: mark v"; mark v
     bindsym Return exec $notify_cmd "mode: default"; mode "default"
     bindsym Escape exec $notify_cmd "mode: default"; mode "default"
 }
@@ -343,8 +341,8 @@ mode "move-workspace" {
     bindsym Return exec $notify_cmd "mode: default"; mode "default"
     bindsym Escape exec $notify_cmd "mode: default"; mode "default"
 }
-bindsym $alt+m exec $notify_cmd "mode: move"; mode "move"
-bindsym $alt+Shift+a exec $notify_cmd "mode: mark";  mode "mark"
+bindsym $alt+Shift+m exec $notify_cmd "mode: move"; mode "move"
+bindsym $alt+Shift+comma exec $notify_cmd "mode: mark";  mode "mark"
 bindsym $alt+o exec $notify_cmd "mode: move-workspace"; mode "move-workspace"
 
 #
@@ -367,10 +365,10 @@ for_window [app_id="firefox" title="Picture-in-Picture"] floating enable
 # mark rules
 for_window [class="Plexamp" window_type="normal"] mark d
 for_window [app_id="plexamp"] mark d
-for_window [class="Ferdium" window_type="normal" window_role="browser-window"] mark z
-for_window [app_id="ferdium"] mark z
-for_window [class="Signal" window_type="normal" window_role="browser-window"] mark x
-for_window [app_id="signal"] mark x
+for_window [class="Ferdium" window_type="normal" window_role="browser-window"] mark x
+for_window [app_id="ferdium"] mark x
+for_window [class="Signal" window_type="normal" window_role="browser-window"] mark c
+for_window [app_id="signal"] mark c
 
 #
 # Autostart
