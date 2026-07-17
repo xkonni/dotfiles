@@ -6,7 +6,7 @@ fi
 k() { u8s kubectl "$@" }
 alias kn="u8s set --namespace"
 alias kc="u8s set --context"
-alias kk="u8s set --kubeconfig"
+alias kkc="u8s set --kubeconfig"
 
 h() { u8s helm "$@" }
 compdef h=helm
@@ -28,7 +28,17 @@ compdef k=kubectl
 alias ke='k exec -ti'
 alias kl='k logs'
 alias klf='k logs -f'
-alias kg='k get'
+function kg() {
+    local extra=()
+    for arg in "$@"; do
+        [[ $arg == -* ]] && continue
+        [[ $arg == servers || $arg == servers.* ]] && extra=(--sort-by='.metadata.labels.kubernetes\.metal\.cloud\.sap/bb')
+        break
+    done
+    k get "$@" "${extra[@]}"
+}
+function _kg() { words=(kubectl get "${words[@]:1}"); (( CURRENT++ )); ${_comps[kubectl]} }
+compdef _kg kg
 alias ky='k get -o yaml'
 alias kga='k get --all-namespaces'
 alias kgm='k get -n metal-servers'
@@ -48,7 +58,7 @@ function _u8s_env() {
 
 function _pick-pod() {
     local lines
-    lines=$(k get pods --all-namespaces -o wide | grep "$@" | grep -v Completed | awk '{print $1, $2, $8}')
+    lines=$(grep "$@" | grep -v Completed | awk '{print $1, $2, $8}')
     [ -z "$lines" ] && return
     local count=$(echo "$lines" | wc -l | tr -d ' ')
     if [ "$count" -le 1 ]; then
@@ -70,10 +80,16 @@ function _eval-metal() {
         return 1
     fi
     echo ">> eval-metal in $U8S_CONTEXT"
-    read mns mpod mcont <<<$(_pick-pod 'metal-operator-controller-manager')
-    read bns bpod bcont <<<$(_pick-pod 'boot-operator-controller-manager')
-    read dns dpod dcont <<<$(_pick-pod 'metal-operator-dnsmasq')
-    read ans apod acont <<<$(_pick-pod -e 'argora-remote-controller-manager' -e 'argora-controller-manager')
+    local pods
+    pods=$(timeout 2 u8s kubectl get pods -A -o wide 2>&1)
+    if [[ $? -ne 0 ]]; then
+        echo "kubectl failed: $pods" >&2
+        return 1
+    fi
+    read mns mpod mcont <<<$(echo "$pods" | _pick-pod 'metal-operator-controller-manager')
+    read bns bpod bcont <<<$(echo "$pods" | _pick-pod 'boot-operator-controller-manager')
+    read dns dpod dcont <<<$(echo "$pods" | _pick-pod 'metal-operator-dnsmasq')
+    read ans apod acont <<<$(echo "$pods" | _pick-pod -e 'argora-remote-controller-manager' -e 'argora-controller-manager')
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "metal-operator" mns "$mns" mpod "$mpod" mcont "$mcont"
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
@@ -83,6 +99,16 @@ function _eval-metal() {
     printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
         "argora-remote" ans "$ans" apod "$apod" acont "$acont"
     export mns mpod mcont bns bpod bcont dns dpod dcont ans apod acont
+}
+
+function _pod-ns() {
+    case $1 in
+        m*) echo "$mns $mpod" ;;
+        b*) echo "$bns $bpod" ;;
+        d*) echo "$dns $dpod" ;;
+        a*) echo "$ans $apod" ;;
+        *) echo "Unknown component prefix: $1" >&2; return 1 ;;
+    esac
 }
 
 function _env-check() {
@@ -118,6 +144,16 @@ function _env-check() {
     esac
 }
 
+function _print-secret() {
+    local raw=${1:-0}
+    local json; json=$(cat)
+    if (( raw )); then
+        jq -r '.data | "username\t\(.username)", "password\t\(.password)"' <<< "$json"
+    else
+        jq -r '.data | "username\t\(.username | @base64d)", "password\t\(.password | @base64d)"' <<< "$json"
+    fi
+}
+
 function _kube-logs() {
     if [ $# -lt 2 ]; then
         echo "Usage: _kube-logs <namespace> <podname>" >&2
@@ -130,26 +166,33 @@ function _kube-logs() {
         echo "k KUBECONFIG missing, exiting." >&2
         return 1
     fi
-    LOGFILE=$HOME/log/$(date +%Y%m%d_%H%M%S)_${pod}.log
+    local logdir=$HOME/log/${U8S_CONTEXT:-no-context}
+    mkdir -p "$logdir"
+    LOGFILE=$logdir/$(date +%Y%m%d_%H%M%S)_${pod}.log
     trap 'echo -e "\n\n> aborted.\n> logs saved to $LOGFILE"; return' INT
     k logs $* -n $ns $pod 2>&1 | tee $LOGFILE
     [ $? ] && echo -e "\n\n> logs saved to $LOGFILE"
     trap - INT
 }
 
-function kkg() {
+function kk() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: $0 <eval|leases|logs|describe|bmcsecret|secret|ssh|curl> [args...]" >&2; return 1
+    fi
     local action=$1; shift
     case $action in
         logs)
+            local -a flags
+            while [[ $1 == -* ]]; do flags+=($1); shift; done
             _env-check $1 || return 1
             local comp=$1; shift
-            case $comp in
-                m*) _kube-logs $mns $mpod "$@" ;;
-                b*) _kube-logs $bns $bpod "$@" ;;
-                d*) _kube-logs $dns $dpod "$@" ;;
-                a*) _kube-logs $ans $apod "$@" ;;
-                *) echo "Unknown component prefix: $comp" >&2; return 1 ;;
-            esac
+            local pod_ns=$(_pod-ns $comp) || return 1
+            _kube-logs ${=pod_ns} "${flags[@]}" "$@"
+            ;;
+        describe)
+            _env-check $1 || return 1
+            local pod_ns=$(_pod-ns $1) || return 1; shift
+            k describe pod -n ${=pod_ns} "$@"
             ;;
         leases)
             _env-check d || return 1
@@ -158,6 +201,11 @@ function kkg() {
                 case $1 in
                     -p) do_ping=1; shift ;;
                     -l) filter=$2; shift 2 ;;
+                    -h|--help)
+                        echo "Usage: $0 leases [-p] [-l <filter>]"
+                        echo "  -p          ping each IP to check reachability"
+                        echo "  -l <filter> grep leases by filter string"
+                        return 0 ;;
                     *) break ;;
                 esac
             done
@@ -186,18 +234,26 @@ function kkg() {
                 echo "Usage: $0 secret [-r] <secret> [namespace]" >&2; return 1
             fi
             local raw=0; [[ $1 == -r ]] && { raw=1; shift }
-            local secret=$1 ns=${2:-metal-servers}
-            local json
-            json=$(k get secret -n "$ns" "$secret" -o json 2>/dev/null)
+            local secret=$1 ns=$2
+            local json ns_flag=()
+            [[ -n $ns ]] && ns_flag=(-n "$ns")
+            json=$(k get secret "${ns_flag[@]}" "$secret" -o json 2>/dev/null)
             if [[ -z $json && $secret != *-system-* ]]; then
-                json=$(k get secret -n "$ns" "${secret}-system-0" -o json 2>/dev/null)
+                json=$(k get secret "${ns_flag[@]}" "${secret}-system-0" -o json 2>/dev/null)
             fi
-            [[ -z $json ]] && { echo "Error: secret \"$secret\" not found in namespace \"$ns\"" >&2; return 1 }
-            if (( raw )); then
-                jq -r '.data | to_entries[] | "\(.key)\t\(.value)"' <<< "$json"
-            else
-                jq -r '.data | to_entries[] | "=== \(.key) ===\n\(.value | @base64d)\n"' <<< "$json"
+            [[ -z $json ]] && { echo "Error: secret \"$secret\" not found${ns:+ in namespace \"$ns\"}" >&2; return 1 }
+            _print-secret $raw <<< "$json"
+            ;;
+        bmcsecret)
+            if [[ $# -lt 1 ]]; then
+                echo "Usage: $0 bmcsecret [-r] <name>" >&2; return 1
             fi
+            local raw=0; [[ $1 == -r ]] && { raw=1; shift }
+            local name=$1
+            local json
+            json=$(k get bmcsecrets.metal.ironcore.dev "$name" -o json 2>/dev/null)
+            [[ -z $json ]] && { echo "Error: bmcsecret \"$name\" not found" >&2; return 1 }
+            _print-secret $raw <<< "$json"
             ;;
         ssh)
             if [[ $# -lt 1 ]]; then
@@ -205,25 +261,46 @@ function kkg() {
             fi
             local node=$1
             [[ "$node" != *-system-* ]] && node="${node}-system-0"
-            local user=${2:-metal} ns=${3:-metal-servers}
+            local user=${2:-metal} ns=$3
             mkdir -p ssh-keys && chmod 700 ssh-keys
-            local key b64 value
-            while IFS=$'\t' read -r key b64; do
-                value=$(base64 -d <<< "$b64")
+            local key value
+            while IFS=$'\t' read -r key value; do
                 case $key in
                     pem) printf '%s\n' "$value" > "ssh-keys/id_${node}"; chmod 600 "ssh-keys/id_${node}"; echo "pem: ssh-keys/id_${node}" ;;
                     pub) printf '%s\n' "$value" > "ssh-keys/id_${node}.pub"; chmod 600 "ssh-keys/id_${node}.pub"; echo "pub: ssh-keys/id_${node}.pub" ;;
                     *)   echo "$key: $value" ;;
                 esac
-            done < <($0 secret -r "${node}-ssh" "$ns")
+            done < <($0 secret "${node}-ssh" "$ns")
             alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
             echo "alias: ssh-$node <IP>"
+            ;;
+        curl)
+            local pipe=cat node= curl_args=()
+            for arg in "$@"; do
+                case $arg in
+                    -j) pipe=jq ;;
+                    -y) pipe=yq ;;
+                    *)  [[ -z $node ]] && node=$arg || curl_args+=("$arg") ;;
+                esac
+            done
+            if [[ -z $node ]]; then
+                echo "Usage: $0 curl [-j|-y] <node> [curl args...]" >&2; return 1
+            fi
+            local user pass
+            while IFS=$'\t' read -r key val; do
+                case $key in
+                    username) user=$val ;;
+                    password) pass=$val ;;
+                esac
+            done < <($0 bmcsecret "$node")
+            [[ -z $user || -z $pass ]] && { echo "Error: could not extract credentials from bmcsecret \"$node\"" >&2; return 1 }
+            curl -u "$user:$pass" "${curl_args[@]}" | $pipe
             ;;
         eval)
             _eval-metal
             ;;
         *)
-            echo "Usage: $0 <eval|leases|logs|secret|ssh> [args...]" >&2; return 1
+            echo "Usage: $0 <eval|leases|logs|describe|bmcsecret|secret|ssh|curl> [args...]" >&2; return 1
             ;;
     esac
 }
