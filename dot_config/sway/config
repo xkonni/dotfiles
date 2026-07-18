@@ -314,6 +314,19 @@ mode "move" {
     bindsym $alt+j focus down
     bindsym $alt+k focus up
     bindsym $alt+l focus right
+    # scratchpad
+    bindsym $alt+s [con_mark="s" tiling=True] focus; [con_mark="s" floating=True] focus output $$main; \
+        [con_mark="s" floating=True] scratchpad show;
+    bindsym $alt+d [con_mark="d" tiling=True] focus; [con_mark="d" floating=True] focus output $$main; \
+        [con_mark="d" floating=True] scratchpad show;
+    bindsym $alt+f [con_mark="f" tiling=True] focus; [con_mark="f" floating=True] focus output $$main; \
+        [con_mark="f" floating=True] scratchpad show;
+    bindsym $alt+x [con_mark="x" tiling=True] focus; [con_mark="x" floating=True] focus output $$main; \
+        [con_mark="x" floating=True] scratchpad show;
+    bindsym $alt+c [con_mark="c" tiling=True] focus; [con_mark="c" floating=True] focus output $$main; \
+        [con_mark="c" floating=True] scratchpad show;
+    bindsym $alt+v [con_mark="v" tiling=True] focus; [con_mark="v" floating=True] focus output $$main; \
+        [con_mark="v" floating=True] scratchpad show;
     # Return to default mode
     bindsym Return exec $notify_cmd "mode: default"; mode "default"
     bindsym Escape exec $notify_cmd "mode: default"; mode "default"
