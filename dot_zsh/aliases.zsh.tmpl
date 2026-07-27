@@ -48,6 +48,9 @@ alias zcp='zmv -Cv'
 alias zln='zmv -Lv'
 
 # usability
+# uu=current user, da=date, sn=file size number — toned down from default bold yellow
+export EZA_COLORS="uu=37:da=34:sn=32"
+
 if type -p eza &> /dev/null
 then
     alias l='eza --git --group-directories-first --icons --smart-group'
