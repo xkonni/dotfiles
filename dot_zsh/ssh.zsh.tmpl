@@ -36,14 +36,14 @@ function ssh_save() {
     if [ ! "$SSH_AUTH_SOCK" = "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
       # existing socket in file invalid
       if [ ! -e "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
-        save_file
+        _ssh_save_file
       fi
     fi
   # file missing
   else
-    save_file
+    _ssh_save_file
   fi
-  set_env
+  _ssh_set_env
 }
 
 # Load SSH_AUTH_SOCK from file
@@ -68,10 +68,10 @@ function ssh_load() {
     fi
     _log "ERROR: missing file \"$SSH_AUTH_SOCK_FILE\""
   fi
-  set_env
-}
+  _ssh_set_env
+ }
 
-function set_env() {
+function _ssh_set_env() {
   if [ -n "$SSH_AUTH_SOCK" ]; then
     {{ if eq .chezmoi.os "darwin" -}}
     launchctl setenv SSH_AUTH_SOCK $SSH_AUTH_SOCK
@@ -81,14 +81,18 @@ function set_env() {
   fi
 }
 
-function save_file() {
-  _log "saving SSH_AUTH_SOCK: $SSH_AUTH_SOCK to file: $SSH_AUTH_SOCK_FILE"
-  echo $SSH_AUTH_SOCK >$SSH_AUTH_SOCK_FILE
+function setup_ssh() {
+  eval $(keychain --quiet --eval)
+  ssh_save
+  echo "> ssh-agent running, SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+  echo "> identity list:"
+  ssh-add -l | while read line; do echo "  - $line"; done
 }
 
-alias sl='ssh-add -l'
-alias sas="ssh_save"
-alias sal="ssh_load"
+function _ssh_save_file() {
+  _log "saving SSH_AUTH_SOCK: $SSH_AUTH_SOCK to file: $SSH_AUTH_SOCK_FILE"
+  echo $SSH_AUTH_SOCK > $SSH_AUTH_SOCK_FILE
+}
 
 {{ if eq .chezmoi.os "linux" -}}
 export SSH_AUTH_SOCK
