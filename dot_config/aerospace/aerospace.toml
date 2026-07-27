@@ -98,17 +98,16 @@ persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     # end tell'
     # '''
     # alt-enter = 'exec-and-forget open -n -a iTerm'
-    alt-enter = '''exec-and-forget osascript -e '
-    tell application "iTerm"
-        create window with profile "Default"
-    end tell'
-    '''
-    # alt-enter = 'exec-and-forget kitty'
+    alt-enter = 'exec-and-forget open -n -a Ghostty.app'
+    # alt-enter = '''exec-and-forget osascript -e '
+    # tell application "iTerm"
+    #     create window with profile "Default"
+    # end tell'
+    # '''
     # alt-r = 'exec-and-forget open -n -a raycast'
 
     # quit application
     alt-shift-q = 'close --quit-if-last-window'
-    # alt-space = 'exec-and-forget open -n -a iTerm -e clipse'
 
     # fullscreen
     alt-shift-f = 'fullscreen --no-outer-gaps'
