@@ -28,18 +28,10 @@ compdef k=kubectl
 alias ke='k exec -ti'
 alias kl='k logs'
 alias klf='k logs -f'
-function kg() {
-    local extra=()
-    for arg in "$@"; do
-        [[ $arg == -* ]] && continue
-        [[ $arg == servers || $arg == servers.* ]] && extra=(--sort-by='.metadata.labels.kubernetes\.metal\.cloud\.sap/bb')
-        break
-    done
-    k get "$@" "${extra[@]}"
-}
-function _kg() { words=(kubectl get "${words[@]:1}"); (( CURRENT++ )); ${_comps[kubectl]} }
-compdef _kg kg
+alias kg='k get'
+alias kgs='k get servers --sort-by=".metadata.labels.kubernetes\.metal\.cloud\.sap/bb"'
 alias ky='k get -o yaml'
+alias kys='k get servers -o yaml'
 alias kga='k get --all-namespaces'
 alias kgm='k get -n metal-servers'
 alias kgp='k get pods -o wide'
@@ -58,7 +50,7 @@ function _u8s_env() {
 
 function _pick-pod() {
     local lines
-    lines=$(grep "$@" | grep -v Completed | awk '{print $1, $2, $8}')
+    lines=$(grep -E "$@" | grep -v Completed | awk '{print $1, $2, $8}')
     [ -z "$lines" ] && return
     local count=$(echo "$lines" | wc -l | tr -d ' ')
     if [ "$count" -le 1 ]; then
@@ -86,59 +78,69 @@ function _eval-metal() {
         echo "kubectl failed: $pods" >&2
         return 1
     fi
-    read mns mpod mcont <<<$(echo "$pods" | _pick-pod 'metal-operator-controller-manager')
+    read mons mopod mocont <<<$(echo "$pods" | _pick-pod 'metal-operator(-core)?-controller-manager')
+    read mmons mmopod mmocont <<<$(echo "$pods" | _pick-pod 'metal-maintenance-operator-controller-manager')
     read bns bpod bcont <<<$(echo "$pods" | _pick-pod 'boot-operator-controller-manager')
     read dns dpod dcont <<<$(echo "$pods" | _pick-pod 'metal-operator-dnsmasq')
     read ans apod acont <<<$(echo "$pods" | _pick-pod -e 'argora-remote-controller-manager' -e 'argora-controller-manager')
-    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
-        "metal-operator" mns "$mns" mpod "$mpod" mcont "$mcont"
-    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
-        "boot-operator" bns "$bns" bpod "$bpod" bcont "$bcont"
-    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
-        "dnsmasq" dns "$dns" dpod "$dpod" dcont "$dcont"
-    printf ">> %-15s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
-        "argora-remote" ans "$ans" apod "$apod" acont "$acont"
-    export mns mpod mcont bns bpod bcont dns dpod dcont ans apod acont
+    printf ">> %-30s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
+        "metal-operator (mo)" mons "$mons" mopod "$mopod" mocont "$mocont"
+    printf ">> %-30s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
+        "metal-maintenance-operator (mmo)" mmons "$mmons" mmopod "$mmopod" mmocont "$mmocont"
+    printf ">> %-30s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
+        "boot-operator (b)" bns "$bns" bpod "$bpod" bcont "$bcont"
+    printf ">> %-30s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
+        "dnsmasq (d)" dns "$dns" dpod "$dpod" dcont "$dcont"
+    printf ">> %-30s\n>  %3s=%-20s %4s=%-50s %5s=%s\n" \
+        "argora-remote (a)" ans "$ans" apod "$apod" acont "$acont"
+    export mons mopod mocont mmons mmopod mmocont bns bpod bcont dns dpod dcont ans apod acont
 }
 
 function _pod-ns() {
     case $1 in
-        m*) echo "$mns $mpod" ;;
-        b*) echo "$bns $bpod" ;;
-        d*) echo "$dns $dpod" ;;
-        a*) echo "$ans $apod" ;;
-        *) echo "Unknown component prefix: $1" >&2; return 1 ;;
+        mo)  echo "$mons $mopod" ;;
+        mmo) echo "$mmons $mmopod" ;;
+        b)   echo "$bns $bpod" ;;
+        d)   echo "$dns $dpod" ;;
+        a)   echo "$ans $apod" ;;
+        *) echo "Unknown component: $1" >&2; return 1 ;;
     esac
 }
 
 function _env-check() {
     case $1 in
-        m*)
-            if [ -z "$mns" ] || [ -z "$mpod" ]; then
+        mo)
+            if [ -z "$mons" ] || [ -z "$mopod" ]; then
                 echo "no metal-operator env found, run eval-metal first." >&2
                 return 1
             fi
             ;;
-        b*)
+        mmo)
+            if [ -z "$mmons" ] || [ -z "$mmopod" ]; then
+                echo "no metal-maintenance-operator env found, run eval-metal first." >&2
+                return 1
+            fi
+            ;;
+        b)
             if [ -z "$bns" ] || [ -z "$bpod" ]; then
                 echo "no boot-operator env found, run eval-metal first." >&2
                 return 1
             fi
             ;;
-        d*)
+        d)
             if [ -z "$dns" ] || [ -z "$dpod" ]; then
                 echo "no dnsmasq env found, run eval-metal first." >&2
                 return 1
             fi
             ;;
-        a*)
+        a)
             if [ -z "$ans" ] || [ -z "$apod" ]; then
                 echo "no argora-remote env found, run eval-metal first." >&2
                 return 1
             fi
             ;;
         *)
-            echo "Unknown component prefix: $1, expected m*, b*, d* or a*." >&2
+            echo "Unknown component: $1, expected mo, mmo, b, d, a." >&2
             return 1
             ;;
     esac
@@ -148,9 +150,9 @@ function _print-secret() {
     local raw=${1:-0}
     local json; json=$(cat)
     if (( raw )); then
-        jq -r '.data | "username\t\(.username)", "password\t\(.password)"' <<< "$json"
+        jq -r '.data | to_entries[] | "\(.key)\t\(.value)"' <<< "$json"
     else
-        jq -r '.data | "username\t\(.username | @base64d)", "password\t\(.password | @base64d)"' <<< "$json"
+        jq -r '.data | to_entries[] | "\(.key)\t\(if (.value | @base64d | test("^[[:print:]\\n\\r\\t]*$")) then (.value | @base64d) else "[binary, \(.value | @base64d | length) bytes]" end)"' <<< "$json"
     fi
 }
 
@@ -263,15 +265,22 @@ function kk() {
             [[ "$node" != *-system-* ]] && node="${node}-system-0"
             local user=${2:-metal} ns=$3
             mkdir -p ssh-keys && chmod 700 ssh-keys
-            local key value
+            local key value secret_user= secret_pass= has_key=0
             while IFS=$'\t' read -r key value; do
                 case $key in
-                    pem) printf '%s\n' "$value" > "ssh-keys/id_${node}"; chmod 600 "ssh-keys/id_${node}"; echo "pem: ssh-keys/id_${node}" ;;
-                    pub) printf '%s\n' "$value" > "ssh-keys/id_${node}.pub"; chmod 600 "ssh-keys/id_${node}.pub"; echo "pub: ssh-keys/id_${node}.pub" ;;
-                    *)   echo "$key: $value" ;;
+                    pem)      base64 -d <<< "$value" > "ssh-keys/id_${node}"; chmod 600 "ssh-keys/id_${node}"; echo "key: ssh-keys/id_${node}"; has_key=1 ;;
+                    pub)      base64 -d <<< "$value" > "ssh-keys/id_${node}.pub"; chmod 600 "ssh-keys/id_${node}.pub"; echo "pub: ssh-keys/id_${node}.pub" ;;
+                    username) secret_user=$(base64 -d <<< "$value"); echo "username: $secret_user" ;;
+                    password) secret_pass=$(base64 -d <<< "$value"); echo "password: $secret_pass" ;;
+                    *)        echo "$key: $value" ;;
                 esac
-            done < <($0 secret "${node}-ssh" "$ns")
-            alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+            done < <($0 secret -r "${node}-ssh" "$ns")
+            [[ -n $secret_user ]] && user=$secret_user
+            if (( has_key )); then
+                alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+            else
+                alias ssh-$node="sshpass -p '$secret_pass' ssh -l $user -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+            fi
             echo "alias: ssh-$node <IP>"
             ;;
         curl)
