@@ -14,6 +14,7 @@ alias cmd='chezmoi diff'
 alias cme='chezmoi edit'
 alias cmce='EDITOR=code chezmoi edit'
 alias cmu='chezmoi update'
+function cmr() { chezmoi apply "$1" && source "$1" }
 
 # git
 alias gl='git log --graph --date=short -n 10'
@@ -48,8 +49,8 @@ alias zcp='zmv -Cv'
 alias zln='zmv -Lv'
 
 # usability
-# uu=current user, da=date, sn=file size number — toned down from default bold yellow
-export EZA_COLORS="uu=37:da=34:sn=32"
+# EZA_COLORS overrides (other defaults still apply): man eza_colors
+export EZA_COLORS="uu=37:da=96:sn=32:ur=33:uw=31:ux=32:ue=32:gr=33:gw=31:gx=32:tr=33:tw=31:tx=32"
 
 if type -p eza &> /dev/null
 then
@@ -57,7 +58,6 @@ then
     alias lt='l -l --sort newest'
     alias llf='l -lf'                                       # files only, long format
     alias lld='l -lD'                                       # directories only, long format
-    alias llh='l -l --hyperlink'                            # long format with hyperlink
 elif type -p lsd &> /dev/null
 then
     alias l='lsd --group-directories-first'
@@ -85,9 +85,9 @@ then
     BAT_CMD=${bat:0:1}
     c() {
         if [[ $# -eq 1 && $1 == *.md ]] && type -p glow &> /dev/null; then
-            glow -w 120 "$1"
+            glow -w ${COLUMNS:-120} "$1"
         else
-            ${BAT_CMD} --paging=never "$@"
+            ${BAT_CMD} --paging=auto "$@"
         fi
     }
     alias B="| bat"
@@ -102,7 +102,7 @@ fi
 
 
 # fd -> fdfind
-fdfind=( /usr/bin/fd(N) /usr/bin/fdfind(N) )
+fdfind=( /usr/bin/fd(N) /usr/bin/fdfind(N) /opt/homebrew/bin/fd(N) )
 if type -p ${fdfind:0:1} &> /dev/null
 then
     FD_CMD=${fdfind:0:1}
@@ -144,19 +144,12 @@ alias ip='ip --color=auto'
 # fasd
 alias v='fasd -fe vim'
 
-# SSH
-alias S='ssh'
-alias SA='ssh-add'
-alias SL='ssh-add -l'
-alias SE='eval $(keychain --eval)'
-function rtssh() {
-    while true
-    do
-        ssh $*
-        echo "retrying in 3..."
-        sleep 3
-    done
-}
+{{ if eq .chezmoi.os "darwin" -}}
+# TAILSCALE
+alias tsup='ts up --accept-dns=false --accept-routes --login-server=https://tailscale.global.cloud.sap --shields-up'
+alias tsdown='ts down'
+alias tss='ts status --json | jq "{BackendState, TailscaleIPs, Online: .Self.Online, Health}"'
+{{ end -}}
 
 # CLIPBOARD
 {{ if eq .chezmoi.os "darwin" -}}

@@ -81,12 +81,21 @@ function _ssh_set_env() {
   fi
 }
 
-function setup_ssh() {
+function setupssh() {
   eval $(keychain --quiet --eval)
   ssh_save
   echo "> ssh-agent running, SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
   echo "> identity list:"
   ssh-add -l | while read line; do echo "  - $line"; done
+}
+
+function rtssh() {
+    while true
+    do
+        ssh $*
+        echo "retrying in 3..."
+        sleep 3
+    done
 }
 
 function _ssh_save_file() {
