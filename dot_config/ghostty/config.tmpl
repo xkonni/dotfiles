@@ -1,0 +1,43 @@
+## THEME
+# theme = GitHub Dark Default
+# theme = Midnight In Mojave
+# theme = Monokai Pro
+theme = Monokai Vivid
+
+## COLORS
+background-opacity = 0.85
+background = 1d1a1e
+# background = 14191e
+# foreground = dbdbdb
+# bold-is-bright = true
+
+## CURSOR
+cursor-style = bar
+cursor-color = #5bc8ff
+
+## FONT
+font-family = CaskaydiaCove NFM
+font-family-bold = CaskaydiaCove NFM Bold
+font-family-italic = CaskaydiaCove NFM Italic
+font-family-bold-italic = CaskaydiaCove NFM Bold Italic
+# font-family = MesloLGM Nerd Font Mono
+# font-family-bold = MesloLGM Nerd Font Mono Bold
+# font-family-italic = MesloLGM Nerd Font Mono Italic
+# font-family-bold-italic = MesloLGM Nerd Font Mono Bold Italic
+font-size = 13
+
+## TERMINAL
+term = xterm-256color
+scrollback-limit = 10000
+
+## WINDOW
+window-padding-x = 8
+window-padding-y = 8
+window-padding-balance = true
+quit-after-last-window-closed = true
+{{ if eq .chezmoi.os "darwin" -}}
+macos-titlebar-style = hidden
+{{- end }}
+
+## KEYBINDINGS
+keybind = ctrl+shift+i=copy_url_to_clipboard
