@@ -73,9 +73,9 @@ function _eval-metal() {
     fi
     echo ">> eval-metal in $U8S_CONTEXT"
     local pods
-    pods=$(timeout 2 u8s kubectl get pods -A -o wide 2>&1)
+    pods=$(timeout 5 u8s kubectl get pods -A -o wide 2>&1)
     if [[ $? -ne 0 ]]; then
-        echo "kubectl failed: $pods" >&2
+        echo "kubectl failed to get all pods: \"$pods\"" >&2
         return 1
     fi
     read mons mopod mocont <<<$(echo "$pods" | _pick-pod 'metal-operator(-core)?-controller-manager')
@@ -168,7 +168,7 @@ function _kube-logs() {
         echo "k KUBECONFIG missing, exiting." >&2
         return 1
     fi
-    local logdir=$HOME/log/${U8S_CONTEXT:-no-context}
+    local logdir=$HOME/workspace/logs/${U8S_CONTEXT:-no-context}
     mkdir -p "$logdir"
     LOGFILE=$logdir/$(date +%Y%m%d_%H%M%S)_${pod}.log
     trap 'echo -e "\n\n> aborted.\n> logs saved to $LOGFILE"; return' INT
@@ -264,12 +264,12 @@ function kk() {
             local node=$1
             [[ "$node" != *-system-* ]] && node="${node}-system-0"
             local user=${2:-metal} ns=$3
-            mkdir -p ssh-keys && chmod 700 ssh-keys
+            mkdir -p ~/workspace/ssh-keys && chmod 700 ~/workspace/ssh-keys
             local key value secret_user= secret_pass= has_key=0
             while IFS=$'\t' read -r key value; do
                 case $key in
-                    pem)      base64 -d <<< "$value" > "ssh-keys/id_${node}"; chmod 600 "ssh-keys/id_${node}"; echo "key: ssh-keys/id_${node}"; has_key=1 ;;
-                    pub)      base64 -d <<< "$value" > "ssh-keys/id_${node}.pub"; chmod 600 "ssh-keys/id_${node}.pub"; echo "pub: ssh-keys/id_${node}.pub" ;;
+                    pem)      base64 -d <<< "$value" > ~/workspace/ssh-keys/id_${node}; chmod 600 ~/workspace/ssh-keys/id_${node}; echo "key: ~/workspace/ssh-keys/id_${node}"; has_key=1 ;;
+                    pub)      base64 -d <<< "$value" > ~/workspace/ssh-keys/id_${node}.pub; chmod 600 ~/workspace/ssh-keys/id_${node}.pub; echo "pub: ~/workspace/ssh-keys/id_${node}.pub" ;;
                     username) secret_user=$(base64 -d <<< "$value"); echo "username: $secret_user" ;;
                     password) secret_pass=$(base64 -d <<< "$value"); echo "password: $secret_pass" ;;
                     *)        echo "$key: $value" ;;
@@ -277,7 +277,7 @@ function kk() {
             done < <($0 secret -r "${node}-ssh" "$ns")
             [[ -n $secret_user ]] && user=$secret_user
             if (( has_key )); then
-                alias ssh-$node="ssh -l $user -i ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+                alias ssh-$node="ssh -l $user -i ~/workspace/ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
             else
                 alias ssh-$node="sshpass -p '$secret_pass' ssh -l $user -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
             fi

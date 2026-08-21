@@ -134,21 +134,23 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 paths=(/usr/local/go/bin $HOME/bin $HOME/.local/bin $HOME/go/bin)
-for p in ${paths[@]}
+for _p in ${paths[@]}
 do
-    if [ -d $p ]
+    if [ -d $_p ]
     then
-        if [[ ! $PATH =~ $p ]]
+        if [[ ! $PATH =~ $_p ]]
         then
-            export PATH=$p:$PATH
+            export PATH=$_p:$PATH
         fi
     fi
 done
+unset _p
 
 if [ -d ~/.zsh ]; then
-  for i in ~/.zsh/*.zsh; do
-    source $i
+  for _i in ~/.zsh/*.zsh; do
+    source $_i
   done
+unset _i
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
