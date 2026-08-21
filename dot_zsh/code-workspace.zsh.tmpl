@@ -1,0 +1,199 @@
+# vim: ft=zsh
+# code-workspace management
+
+function _cw_project_names() {
+  local ws
+  ws=$(_cw_workspace_file 2>/dev/null) || return
+  _cw_parse_folders "$ws" | awk -F'\t' '{print $1}'
+}
+
+function _cw_activate_names() {
+  # workspace names under ~/workspace/
+  local -a names
+  names=(~/workspace/*/*(N/:t))
+  # also direct .code-workspace files one level down
+  local f
+  for f in ~/workspace/*/*.code-workspace(N); do
+    names+=("${f:h:t}")
+  done
+  print -l "${(u)names[@]}"
+}
+
+function _cw() {
+  local state
+  _arguments \
+    '1:command:((ls\:"list projects" cd\:"cd into project" status\:"git status" activate\:"activate workspace" help\:"show help"))' \
+    '*::arg:->arg'
+
+  case $state in
+    arg)
+      case $words[1] in
+        cd|status)
+          local -a projs
+          projs=($(_cw_project_names))
+          _describe 'project' projs
+          ;;
+        activate)
+          local -a names
+          names=($(_cw_activate_names))
+          _describe 'workspace' names
+          ;;
+      esac
+      ;;
+  esac
+}
+
+compdef _cw cw
+
+alias cwc='cw cd'
+alias cws='cw status'
+alias cwa='cw activate'
+
+function _cw_workspace_file() {
+  if [[ -n "$CODE_WORKSPACE" ]]; then
+    echo "$CODE_WORKSPACE"
+    return 0
+  fi
+  local f=(*.code-workspace(N))
+  if [[ ${#f} -gt 0 ]]; then
+    local abs="${PWD}/${f[1]}"
+    export CODE_WORKSPACE="$abs"
+    echo "$abs"
+    return 0
+  fi
+  return 1
+}
+
+function _cw_parse_folders() {
+  local ws="$1"
+  # returns lines of "name\tpath" with path resolved relative to workspace dir
+  local wsdir="${ws:h}"
+  python3 -c "
+import json, os, sys
+ws = json.load(open('$ws'))
+wsdir = '$wsdir'
+for f in ws.get('folders', []):
+    p = os.path.normpath(os.path.join(wsdir, f['path']))
+    print(f[\"name\"] + '\t' + p)
+"
+}
+
+function cw() {
+  local cmd="${1:-ls}"
+
+  case "$cmd" in
+
+    activate)
+      local target="$2"
+      if [[ -z "$target" ]]; then
+        echo "usage: cw activate <name-or-path>"
+        return 1
+      fi
+      # full path given
+      if [[ "$target" == /* ]]; then
+        if [[ ! -f "$target" ]]; then
+          echo "cw: file not found: $target"
+          return 1
+        fi
+        export CODE_WORKSPACE="$target"
+      else
+        # name relative to ~/workspace
+        local candidate=~/workspace/${target}/${target}.code-workspace
+        [[ ! -f "$candidate" ]] && candidate=~/workspace/${target}/*.code-workspace(N[1])
+        [[ ! -f "$candidate" ]] && candidate=(~/workspace/${target}/*.code-workspace(N))
+        if [[ -z "$candidate" || ! -f "$candidate" ]]; then
+          echo "cw: no .code-workspace found in ~/workspace/$target"
+          return 1
+        fi
+        export CODE_WORKSPACE="$candidate"
+      fi
+      echo "activated: $CODE_WORKSPACE"
+      ;;
+
+    ls)
+      local ws
+      ws=$(_cw_workspace_file) || {
+        echo "cw: no active workspace. use: cw activate <name>"
+        return 1
+      }
+      echo "workspace: $ws"
+      echo ""
+      _cw_parse_folders "$ws" | while IFS=$'\t' read cw_name cw_dir; do
+        printf "  %-45s %s\n" "$cw_name" "$cw_dir"
+      done
+      ;;
+
+    cd)
+      local proj="$2"
+      local ws
+      ws=$(_cw_workspace_file) || {
+        echo "cw: no active workspace. use: cw activate <name>"
+        return 1
+      }
+      if [[ -z "$proj" ]]; then
+        cd "${ws:h}"
+        return
+      fi
+      local match
+      match=$(_cw_parse_folders "$ws" | awk -F'\t' -v p="$proj" '$1 == p {print $2}')
+      if [[ -z "$match" ]]; then
+        echo "cw: project '$proj' not found in workspace"
+        echo "available:"
+        _cw_parse_folders "$ws" | awk -F'\t' '{print "  " $1}'
+        return 1
+      fi
+      cd "$match"
+      ;;
+
+    status)
+      local proj="$2"
+      local ws
+      ws=$(_cw_workspace_file) || {
+        echo "cw: no active workspace. use: cw activate <name>"
+        return 1
+      }
+      if [[ -z "$proj" ]]; then
+        # status for all projects
+        local first=1
+        _cw_parse_folders "$ws" | while IFS=$'\t' read cw_name cw_dir; do
+          [[ $first -eq 1 ]] && first=0 || echo ""
+          print -P "%B%F{214}── $cw_name ──%f%b"
+          if [[ -d "$cw_dir/.git" ]]; then
+            git -C "$cw_dir" status
+          else
+            echo "(no git)"
+          fi
+        done
+      else
+        local match
+        match=$(_cw_parse_folders "$ws" | awk -F'\t' -v p="$proj" '$1 == p {print $2}')
+        if [[ -z "$match" ]]; then
+          echo "cw: project '$proj' not found in workspace"
+          return 1
+        fi
+        git -C "$match" status
+      fi
+      ;;
+
+    help|--help|-h)
+      cat <<'EOF'
+cw — code-workspace manager
+
+  cw activate <name>      activate workspace by name (searches ~/workspace/<name>/)
+  cw activate <path>      activate workspace by full path to .code-workspace file
+  cw ls                   list all projects in active workspace
+  cw cd [project]         cd into project directory (or workspace root if omitted)
+  cw status [project]     git status for one or all projects
+  cw help                 show this help
+
+Active workspace is set via $CODE_WORKSPACE. If unset, auto-detects a
+.code-workspace file in the current directory.
+EOF
+      ;;
+
+    *)
+      echo "cw: unknown command '$cmd'. try: cw help"
+      return 1
+      ;;
+  esac
+}
