@@ -159,6 +159,17 @@ set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'samoshkin/tmux-plugin-sysstat'
 set -g @plugin 'wfxr/tmux-fzf-url'
+set -g @plugin 'omerxx/tmux-floax'
+# Floax plugin settings
+set -g @floax-bind '-n C-g'
+set -g @floax-bind-menu 'g'
+set -g @floax-width '88%'
+set -g @floax-height '76%'
+set -g @floax-border-color '#268bd2'
+set -g @floax-text-color '#c8d1dc'
+set -g @floax-session-name 'popup-shell'
+set -g @floax-change-path 'false'
+set -g @floax-title ' floax '
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
