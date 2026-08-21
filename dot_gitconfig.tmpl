@@ -77,7 +77,7 @@
 
     # commit
 {{ if or (eq .chezmoi.os "darwin") .devcontainer }}
-    commit = commit -s                # commit (signed-off)
+    commit = commit -s                e commit (signed-off)
     c = commit -s -m                  # commit with message (signed-off)
     ca = commit -s -am                # commit all with message (signed-off)
 {{ else }}
@@ -125,11 +125,13 @@
 
     # rebase
     re = rebase                       # rebase
-    rc = rebase --continue            # continue rebase
-    rs = rebase --skip                # skip rebase
-    ra = rebase --abort               # abort rebase
+    rec = rebase --continue           # continue rebase
+    res = rebase --skip               # skip rebase
+    rea = rebase --abort              # abort rebase
     reom = rebase origin/main         # rebase origin/main
     reoms  = rebase origin/master     # rebase origin/master
+    reum = rebase upstream/main       # rebase upstream/main
+    reums  = rebase upstream/master   # rebase upstream/master
 
     # remote
     r = remote -v                     # show remotes (verbose)
@@ -229,6 +231,10 @@
 [init]
     defaultBranch = main
 
+{{ if eq .chezmoi.os "darwin" -}}
+[include]
+    path = ~/.gitconfig-extra
+{{ end -}}
 [oh-my-zsh]
     hide-dirty = 1
     hide-status = 1
