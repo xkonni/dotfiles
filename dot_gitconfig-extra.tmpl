@@ -1,0 +1,8 @@
+{{ if eq .chezmoi.os "darwin" -}}
+[user]
+    email = {{ output "security" "find-generic-password" "-s" "chezmoi-git" "-a" "work_email" "-w" | trim | quote }}
+    signingkey = {{ output "security" "find-generic-password" "-s" "chezmoi-git" "-a" "work_signingkey" "-w" | trim }}
+
+[commit]
+    gpgsign = true
+{{- end }}
