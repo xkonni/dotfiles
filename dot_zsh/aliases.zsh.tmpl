@@ -115,12 +115,13 @@ fi
 # fz
 if type -p fzf &> /dev/null && [[ -n "$BAT_CMD" ]] && [[ -n "$FD_CMD" ]]
 then
-    alias fz="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} ${BAT_CMD} {}"
-    alias fzv="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} vim {}"
+    alias fz="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" --print0 | xargs -0 -I{} ${BAT_CMD} {}"
+    alias fzv="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" --print0 | xargs -0 -I{} vim {}"
+    alias fzc="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" --print0 | xargs -0 -I{} code {}"
 {{ if eq .chezmoi.os "darwin" -}}
-    alias fzo="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} open {}"
+    alias fzo="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" --print0 | xargs -0 -I{} open {}"
 {{ else if eq .chezmoi.os "linux" -}}
-    alias fzo="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" | xargs -d \"\n\" -I{} xdg-open {}"
+    alias fzo="${FD_CMD} --type f . | fzf --preview \"${BAT_CMD} --color=always --style=numbers {}\" --print0 | xargs -0 -I{} xdg-open {}"
 {{ end -}}
 fi
 

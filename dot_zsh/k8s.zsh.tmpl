@@ -43,6 +43,40 @@ alias -g OY="-o yaml"
 alias -g OYL="-o yaml | bat -l yaml"
 alias -g OW="-o wide"
 
+function bumpChart() {
+  local decrement=0
+  [[ "$1" == -d ]] && { decrement=1; shift }
+
+  local chart
+  if [[ -f "$1" ]]; then
+    chart="$1"
+  elif [[ -d "$1" ]]; then
+    chart="$1/Chart.yaml"
+  elif [[ -z "$1" && -f Chart.yaml ]]; then
+    chart="Chart.yaml"
+  else
+    echo "usage: bumpChart [-d] [dir|Chart.yaml]" >&2; return 1
+  fi
+  [[ -f "$chart" ]] || { echo "bumpChart: not found: $chart" >&2; return 1 }
+
+  local version
+  version=$(grep -E '^version:' "$chart" | awk '{print $2}')
+  [[ -z "$version" ]] && { echo "bumpChart: no version field in $chart" >&2; return 1 }
+
+  local major minor patch
+  IFS='.' read -r major minor patch <<< "$version"
+  if (( decrement )); then
+    (( patch > 0 )) || { echo "bumpChart: patch is already 0" >&2; return 1 }
+    (( patch-- ))
+  else
+    (( patch++ ))
+  fi
+
+  local new_version="${major}.${minor}.${patch}"
+  sed -i "s/^version: .*/version: ${new_version}/" "$chart"
+  echo "${version} → ${new_version}  (${chart})"
+}
+
 {{ if eq .chezmoi.os "darwin" -}}
 function _u8s_env() {
   u8s env | while IFS='=' read -r k v; do export "$k"="$v"; done
@@ -264,12 +298,12 @@ function kk() {
             local node=$1
             [[ "$node" != *-system-* ]] && node="${node}-system-0"
             local user=${2:-metal} ns=$3
-            mkdir -p ~/workspace/ssh-keys && chmod 700 ~/workspace/ssh-keys
+            mkdir -p /tmp/ssh-keys && chmod 700 /tmp/ssh-keys
             local key value secret_user= secret_pass= has_key=0
             while IFS=$'\t' read -r key value; do
                 case $key in
-                    pem)      base64 -d <<< "$value" > ~/workspace/ssh-keys/id_${node}; chmod 600 ~/workspace/ssh-keys/id_${node}; echo "key: ~/workspace/ssh-keys/id_${node}"; has_key=1 ;;
-                    pub)      base64 -d <<< "$value" > ~/workspace/ssh-keys/id_${node}.pub; chmod 600 ~/workspace/ssh-keys/id_${node}.pub; echo "pub: ~/workspace/ssh-keys/id_${node}.pub" ;;
+                    pem)      base64 -d <<< "$value" > /tmp/ssh-keys/id_${node}; chmod 600 /tmp/ssh-keys/id_${node}; echo "key: /tmp/ssh-keys/id_${node}"; has_key=1 ;;
+                    pub)      base64 -d <<< "$value" > /tmp/ssh-keys/id_${node}.pub; chmod 600 /tmp/ssh-keys/id_${node}.pub; echo "pub: /tmp/ssh-keys/id_${node}.pub" ;;
                     username) secret_user=$(base64 -d <<< "$value"); echo "username: $secret_user" ;;
                     password) secret_pass=$(base64 -d <<< "$value"); echo "password: $secret_pass" ;;
                     *)        echo "$key: $value" ;;
@@ -277,7 +311,7 @@ function kk() {
             done < <($0 secret -r "${node}-ssh" "$ns")
             [[ -n $secret_user ]] && user=$secret_user
             if (( has_key )); then
-                alias ssh-$node="ssh -l $user -i ~/workspace/ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+                alias ssh-$node="ssh -l $user -i /tmp/ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
             else
                 alias ssh-$node="sshpass -p '$secret_pass' ssh -l $user -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
             fi
@@ -312,6 +346,41 @@ function kk() {
             echo "Usage: $0 <eval|leases|logs|describe|bmcsecret|secret|ssh|curl> [args...]" >&2; return 1
             ;;
     esac
+}
+
+function bumpChart() {
+  local decrement=0
+  [[ "$1" == -d ]] && { decrement=1; shift }
+
+  local chart
+  if [[ -f "$1" ]]; then
+    chart="$1"
+  elif [[ -d "$1" ]]; then
+    chart="$1/Chart.yaml"
+  elif [[ -z "$1" && -f Chart.yaml ]]; then
+    chart="Chart.yaml"
+  else
+    echo "usage: bumpChart [-d] [dir|Chart.yaml]" >&2; return 1
+  fi
+  [[ -f "$chart" ]] || { echo "bumpChart: not found: $chart" >&2; return 1 }
+
+  local version
+  version=$(grep -E '^version:' "$chart" | awk '{print $2}')
+  [[ -z "$version" ]] && { echo "bumpChart: no version field in $chart" >&2; return 1 }
+
+  local major minor patch
+  IFS='.' read -r major minor patch <<< "$version"
+  if (( decrement )); then
+    (( patch > 0 )) || { echo "bumpChart: patch is already 0" >&2; return 1 }
+    (( patch-- ))
+  else
+    (( patch++ ))
+  fi
+
+  local new_version="${major}.${minor}.${patch}"
+  local tmp
+  tmp=$(mktemp) && sed "s/^version: .*/version: ${new_version}/" "$chart" > "$tmp" && mv "$tmp" "$chart"
+  echo "${version} → ${new_version}  (${chart})"
 }
 
 function kping() {
