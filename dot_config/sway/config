@@ -273,6 +273,14 @@ bindsym $alt+Control+Shift+period exec swaync-client --close-all
 #
 # Modes
 #
+mode "mouse" {
+    bindsym $alt+s exec wl-kbptr -o modes=split,bisect,click
+    bindsym $alt+b exec wl-kbptr -o modes=bisect,click
+    bindsym $alt+t exec wl-kbptr -o modes=tile
+
+    bindsym Return exec $notify_cmd "mode: default"; mode "default"
+    bindsym Escape exec $notify_cmd "mode: default"; mode "default"
+}
 mode "move" {
     bindsym $left move left 25px
     bindsym $down move down 25px
@@ -354,6 +362,8 @@ mode "move-workspace" {
     bindsym Return exec $notify_cmd "mode: default"; mode "default"
     bindsym Escape exec $notify_cmd "mode: default"; mode "default"
 }
+# bindsym $alt+Shift+n exec $notify_cmd "mode: mouse"; mode "mouse"
+bindsym $alt+Shift+n exec $notify_cmd "mode: mouse"; exec 'wl-kbptr -o modes=split,bisect,click ; $notify_cmd "mode: default"'
 bindsym $alt+Shift+m exec $notify_cmd "mode: move"; mode "move"
 bindsym $alt+Shift+comma exec $notify_cmd "mode: mark";  mode "mark"
 bindsym $alt+o exec $notify_cmd "mode: move-workspace"; mode "move-workspace"
