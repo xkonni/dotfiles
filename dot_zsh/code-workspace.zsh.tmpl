@@ -22,7 +22,7 @@ function _cw_activate_names() {
 function _cw() {
   local state
   _arguments \
-    '1:command:((ls\:"list projects" cd\:"cd into project" status\:"git status" activate\:"activate workspace" help\:"show help"))' \
+    '1:command:((ls\:"list projects" cd\:"cd into project" status\:"git status" grep\:"ripgrep in all projects" activate\:"activate workspace" help\:"show help"))' \
     '*::arg:->arg'
 
   case $state in
@@ -47,7 +47,40 @@ compdef _cw cw
 
 alias cwc='cw cd'
 alias cws='cw status'
+alias cwg='cw grep'
 alias cwa='cw activate'
+
+function _cw_fuzzy_repo() {
+  local query="$1" idx
+  shift
+  local -a names=("$@")
+  # exact match
+  idx=${names[(i)$query]}
+  (( idx <= ${#names} )) && { echo "$idx"; return 0 }
+  # substring match
+  local -a hits=()
+  for i in {1..${#names}}; do
+    [[ "${names[$i]}" == *"$query"* ]] && hits+=($i)
+  done
+  if (( ${#hits} == 1 )); then
+    echo "${hits[1]}"
+    return 0
+  elif (( ${#hits} > 1 )); then
+    echo "cw: ambiguous repo '$query' matches: ${(j:, :)names[$hits]}" >&2
+    return 1
+  fi
+  echo "cw: repo '$query' not found in workspace" >&2
+  return 1
+}
+
+function _cw_require_workspace() {
+  local ws
+  ws=$(_cw_workspace_file 2>/dev/null) || {
+    echo "cw: no active workspace. use: cw activate <name>" >&2
+    return 1
+  }
+  echo "$ws"
+}
 
 function _cw_workspace_file() {
   if [[ -n "$CODE_WORKSPACE" ]]; then
@@ -112,10 +145,7 @@ function cw() {
 
     ls)
       local ws
-      ws=$(_cw_workspace_file) || {
-        echo "cw: no active workspace. use: cw activate <name>"
-        return 1
-      }
+      ws=$(_cw_require_workspace) || return 1
       echo "workspace: $ws"
       echo ""
       _cw_parse_folders "$ws" | while IFS=$'\t' read cw_name cw_dir; do
@@ -126,16 +156,25 @@ function cw() {
     cd)
       local proj="$2"
       local ws
-      ws=$(_cw_workspace_file) || {
-        echo "cw: no active workspace. use: cw activate <name>"
-        return 1
-      }
+      ws=$(_cw_require_workspace) || return 1
       if [[ -z "$proj" ]]; then
-        cd "${ws:h}"
-        return
+        if command -v fzf &>/dev/null; then
+          proj=$(_cw_parse_folders "$ws" | awk -F'\t' '{print $1}' | fzf --prompt="project> " --height=40% --reverse)
+          [[ -z "$proj" ]] && return 0
+        else
+          cd "${ws:h}"
+          return
+        fi
       fi
       local match
       match=$(_cw_parse_folders "$ws" | awk -F'\t' -v p="$proj" '$1 == p {print $2}')
+      if [[ -z "$match" ]]; then
+        if command -v fzf &>/dev/null; then
+          proj=$(_cw_parse_folders "$ws" | awk -F'\t' '{print $1}' | fzf --prompt="project> " --query="$proj" --height=40% --reverse)
+          [[ -z "$proj" ]] && return 0
+          match=$(_cw_parse_folders "$ws" | awk -F'\t' -v p="$proj" '$1 == p {print $2}')
+        fi
+      fi
       if [[ -z "$match" ]]; then
         echo "cw: project '$proj' not found in workspace"
         echo "available:"
@@ -146,33 +185,114 @@ function cw() {
       ;;
 
     status)
-      local proj="$2"
       local ws
-      ws=$(_cw_workspace_file) || {
-        echo "cw: no active workspace. use: cw activate <name>"
-        return 1
-      }
-      if [[ -z "$proj" ]]; then
-        # status for all projects
-        local first=1
-        _cw_parse_folders "$ws" | while IFS=$'\t' read cw_name cw_dir; do
-          [[ $first -eq 1 ]] && first=0 || echo ""
-          print -P "%B%F{214}── $cw_name ──%f%b"
-          if [[ -d "$cw_dir/.git" ]]; then
-            git -C "$cw_dir" status
-          else
-            echo "(no git)"
-          fi
-        done
-      else
-        local match
-        match=$(_cw_parse_folders "$ws" | awk -F'\t' -v p="$proj" '$1 == p {print $2}')
-        if [[ -z "$match" ]]; then
-          echo "cw: project '$proj' not found in workspace"
-          return 1
+      ws=$(_cw_require_workspace) || return 1
+      shift  # drop 'status'
+
+      local all=0
+      local -a repo_filter=()
+      while [[ "$1" == -r || "$1" == -a ]]; do
+        if [[ "$1" == -a ]]; then all=1; shift
+        else repo_filter+=("$2"); shift 2
         fi
-        git -C "$match" status
+      done
+
+      local -a all_names=() all_dirs=()
+      while IFS=$'\t' read -r cw_name cw_dir; do
+        all_names+=("$cw_name")
+        all_dirs+=("$cw_dir")
+      done < <(_cw_parse_folders "$ws")
+
+      local -a search_names=() search_dirs=()
+      local idx
+      if (( ${#repo_filter} > 0 )); then
+        for r in "${repo_filter[@]}"; do
+          idx=$(_cw_fuzzy_repo "$r" "${all_names[@]}") || return 1
+          search_names+=("${all_names[$idx]}")
+          search_dirs+=("${all_dirs[$idx]}")
+        done
+      elif (( all )) || ! command -v fzf &>/dev/null; then
+        search_names=("${all_names[@]}")
+        search_dirs=("${all_dirs[@]}")
+      else
+        local selected
+        selected=$(printf '%s\n' "${all_names[@]}" | fzf --multi --prompt="repos> " --height=40% --reverse --bind 'ctrl-a:select-all')
+        [[ -z "$selected" ]] && return 0
+        while IFS= read -r name; do
+          idx=${all_names[(i)$name]}
+          search_names+=("${all_names[$idx]}")
+          search_dirs+=("${all_dirs[$idx]}")
+        done <<< "$selected"
       fi
+
+      local first=1
+      for i in {1..${#search_names}}; do
+        [[ $first -eq 1 ]] && first=0 || echo ""
+        print -P "%B%F{214}── ${search_names[$i]} ──%f%b"
+        if [[ -d "${search_dirs[$i]}/.git" ]]; then
+          git -C "${search_dirs[$i]}" status
+        else
+          echo "(no git)"
+        fi
+      done
+      ;;
+
+    grep)
+      local ws
+      ws=$(_cw_require_workspace) || return 1
+      shift  # drop 'grep'
+
+      local all=0
+      local -a repo_filter=()
+      while [[ "$1" == -r || "$1" == -a ]]; do
+        if [[ "$1" == -a ]]; then all=1; shift
+        else repo_filter+=("$2"); shift 2
+        fi
+      done
+
+      local pattern="$1"
+      if [[ -z "$pattern" ]]; then
+        echo "usage: cw grep [-a] [-r repo]... <pattern> [rg-options...]"
+        return 1
+      fi
+      shift
+
+      local -a all_names=() all_dirs=()
+      while IFS=$'\t' read -r cw_name cw_dir; do
+        all_names+=("$cw_name")
+        all_dirs+=("$cw_dir")
+      done < <(_cw_parse_folders "$ws")
+
+      local -a search_names=() search_dirs=()
+      local idx
+      if (( ${#repo_filter} > 0 )); then
+        for r in "${repo_filter[@]}"; do
+          idx=$(_cw_fuzzy_repo "$r" "${all_names[@]}") || return 1
+          search_names+=("${all_names[$idx]}")
+          search_dirs+=("${all_dirs[$idx]}")
+        done
+      elif (( all )) || ! command -v fzf &>/dev/null; then
+        search_names=("${all_names[@]}")
+        search_dirs=("${all_dirs[@]}")
+      else
+        local selected
+        selected=$(printf '%s\n' "${all_names[@]}" | fzf --multi --prompt="repos> " --height=40% --reverse --bind 'ctrl-a:select-all')
+        [[ -z "$selected" ]] && return 0
+        while IFS= read -r name; do
+          idx=${all_names[(i)$name]}
+          search_names+=("${all_names[$idx]}")
+          search_dirs+=("${all_dirs[$idx]}")
+        done <<< "$selected"
+      fi
+
+      local output first=1
+      for i in {1..${#search_names}}; do
+        output=$(rg --color=always --heading "$pattern" "$@" "${search_dirs[$i]}" 2>/dev/null)
+        [[ -z "$output" ]] && continue
+        [[ $first -eq 1 ]] && first=0 || echo ""
+        print -P "%B%F{214}── ${search_names[$i]} ──%f%b"
+        echo "$output"
+      done
       ;;
 
     help|--help|-h)
@@ -182,8 +302,9 @@ cw — code-workspace manager
   cw activate <name>      activate workspace by name (searches ~/workspace/<name>/)
   cw activate <path>      activate workspace by full path to .code-workspace file
   cw ls                   list all projects in active workspace
+  cw grep [-a] [-r repo]... <pattern> [opts]    ripgrep across selected projects
   cw cd [project]         cd into project directory (or workspace root if omitted)
-  cw status [project]     git status for one or all projects
+  cw status [-a] [-r repo]...                   git status for selected projects
   cw help                 show this help
 
 Active workspace is set via $CODE_WORKSPACE. If unset, auto-detects a
