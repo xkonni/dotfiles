@@ -183,14 +183,14 @@ function epwd() {
 function cp2wd() {
   if [ -e ~/.wd ];
   then
-    cp "$@" $(cat ~/.wd)
+    cp "$@" "$(cat ~/.wd)"
   fi
 }
 
 function mv2wd() {
   if [ -e ~/.wd ];
   then
-    mv "$@" $(cat ~/.wd)
+    mv "$@" "$(cat ~/.wd)"
   fi
 }
 
