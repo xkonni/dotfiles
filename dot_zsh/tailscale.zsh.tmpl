@@ -1,5 +1,7 @@
 {{- if eq .chezmoi.os "darwin" -}}
 # vim: ft=zsh
-alias tailscale='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
-alias ts='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
-{{- end }}
+alias ts=tailscale
+alias tss='ts status --json | jq "{BackendState, TailscaleIPs, Online: .Self.Online, Health}"'
+alias tsup='ts up --accept-dns=false --accept-routes --login-server=https://tailscale.global.cloud.sap --shields-up'
+alias tsdn='ts down'
+{{ end -}}
