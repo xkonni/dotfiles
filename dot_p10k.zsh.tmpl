@@ -50,10 +50,13 @@
   # Left prompt segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 ]=========================
+{{- if eq .chezmoi.os "darwin" }}
+    # cld
+    u8s
+{{- end }}
     context                   # user@host
     dir                       # current directory
     vcs                       # git status
-    command_execution_time    # previous command duration
     # =========================[ Line #2 ]=========================
     newline                   # \n
     virtualenv                # python virtual environment
@@ -67,10 +70,7 @@
     # virtualenv              # python virtual environment
     # context                 # user@host
     time                      # current time
-{{- if eq .chezmoi.os "darwin" }}
-    # cld
-    u8s
-{{- end }}
+    command_execution_time    # previous command duration
     # =========================[ Line #2 ]=========================
     newline                   # \n
   )
@@ -195,11 +195,11 @@
 {{- if eq .chezmoi.os "darwin" }}
   function prompt_u8s() {
     eval $(u8s env | grep -v Application)
-    context="[$U8S_CONTEXT|$U8S_NAMESPACE]"
     if [ -n "$U8S_CONTEXT" ]
     then
-      # p10k segment -f 111 -i '' -t "$context"
-      p10k segment -f 111 -i '' -t "$context"
+      context="$U8S_CONTEXT ${U8S_NAMESPACE:+($U8S_NAMESPACE) }❯"
+      # p10k segment -f 111 -i '' -t "$context"
+      p10k segment -f 99 -t "$context"
     fi
   }
 
