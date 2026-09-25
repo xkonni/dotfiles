@@ -46,11 +46,11 @@ set-option -g status-style "fg=$FG1,bg=$BG"
 set-option -g message-style "fg=$FG2,bg=$BG"
 set-option -g message-command-style "fg=$FG2,bg=$BG"
 set-option -g mode-style "fg=$FG2,bg=$BG"
-set-option -g pane-border-style "fg=$FG1,bg=$BG"
-set-option -g pane-active-border-style "fg=$FG2,bg=$BG"
+set-option -g pane-border-style "fg=$FG1,bg=default"
+set-option -g pane-active-border-style "fg=colour129,bg=default"
 # status left
 set -g status-left-length 40
-set -g status-left "#{?client_prefix,#[fg=$FG2_HL#,bold],#[fg=$FG2#,bold]}#(hostname | cut -d'.' -f -2) #[fg=$FG1,bold]#S  "
+set -g status-left "#{?client_prefix,#[fg=$FG2_HL#,bold],#[fg=$FG2#,bold]}#(hostname | cut -d'.' -f -2) #[fg=$FG1,bold]#S  "
 # status center
 set -g window-status-format "#{?client_prefix,#[fg=$FG1#,bold],#[fg=$FG0#,bold]}#I-#W "
 set -g window-status-current-format "#{?client_prefix,#[fg=$FG2_HL#,bold],#[fg=$FG2#,bold]}#I-#W "
@@ -165,7 +165,7 @@ set -g @floax-bind '-n C-g'
 set -g @floax-bind-menu 'g'
 set -g @floax-width '88%'
 set -g @floax-height '76%'
-set -g @floax-border-color '#268bd2'
+set -g @floax-border-color '#ae81ff'
 set -g @floax-text-color '#c8d1dc'
 set -g @floax-session-name 'popup-shell'
 set -g @floax-change-path 'false'
