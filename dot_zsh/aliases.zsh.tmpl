@@ -1,6 +1,24 @@
 # vim: ft=zsh
-# aliases and simple functions
-#
+# Aliases and shared functions.
+# Sourced before other zsh files (alphabetically first); anything required
+# by other dotfiles goes here.
+
+# pprint <color> <text> [<color> <text> ...] — print color-paired tokens on one line
+function pprint() {
+    while [[ $# -ge 2 ]]; do
+        local color=$1 text=$2
+        if [[ $color == bold:* ]]; then
+            print -Pn "%B%F{${color#bold:}}${text}%f%b"
+        elif [[ $color == (none|reset|clear) ]]; then
+            print -Pn "%f${text}"
+        else
+            print -Pn "%F{$color}${text}%f"
+        fi
+        shift 2
+        (( $# )) && print -Pn " "
+    done
+    print
+}
 
 # ohmyzsh
 alias omr='omz reload'
@@ -29,7 +47,6 @@ alias gs='git status'
 alias gss='git status -s'
 
 # gemini
-alias gm='pushd ~/workspace/gemini; gemini; popd'
 alias gm='pushd ~/workspace/gemini; gemini; popd'
 
 # tmux
@@ -77,6 +94,11 @@ alias lla='l -al'
 
 # default options for less
 export LESS='-F -j4'
+if type -p jless &> /dev/null
+then
+    alias yless='jless --yaml'
+fi
+
 
 # c -> bat/batcat or cat
 bat=( /usr/bin/bat(N) /usr/bin/batcat(N) /opt/homebrew/bin/bat(N) )
@@ -146,13 +168,6 @@ alias ip='ip --color=auto'
 # fasd
 alias v='fasd -fe vim'
 
-{{ if eq .chezmoi.os "darwin" -}}
-# TAILSCALE
-alias tsup='ts up --accept-dns=false --accept-routes --login-server=https://tailscale.global.cloud.sap --shields-up'
-alias tsdown='ts down'
-alias tss='ts status --json | jq "{BackendState, TailscaleIPs, Online: .Self.Online, Health}"'
-{{ end -}}
-
 # CLIPBOARD
 {{ if eq .chezmoi.os "darwin" -}}
 alias -g CP='| pbcopy'
@@ -204,14 +219,11 @@ globalias() {
     zle _expand_alias
     zle expand-word
   fi
-  # zle self-insert # inserts keys used to activate
   print -n " "
 }
 zle -N globalias
-# bindkey " " globalias                 # space key to expand globalalias
-# bindkey "^ " magic-space              # control-space to bypass completion
-bindkey -M emacs "^ " globalias                 # space key to expand globalalias
-bindkey -M viins "^ " globalias                 # space key to expand globalalias
-bindkey -M emacs " " magic-space              # control-space to bypass comp$letion
-bindkey -M viins " " magic-space              # control-space to bypass completion
-bindkey -M isearch " " magic-space    # normal space during searches
+bindkey -M emacs "^ " globalias
+bindkey -M viins "^ " globalias
+bindkey -M emacs " " magic-space
+bindkey -M viins " " magic-space
+bindkey -M isearch " " magic-space
