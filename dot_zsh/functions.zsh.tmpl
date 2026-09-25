@@ -1,5 +1,6 @@
 # vim: ft=zsh
-# FUNCTIONS
+# User-space utility functions — standalone, not required by other dotfiles.
+
 {{ if eq .chezmoi.os "linux" -}}
 function open() {
   for i in $@; do
@@ -14,6 +15,7 @@ function remod() {
 }
 {{ end -}}
 
+# sleep with progress display
 function isleep() {
   if [ "$1" = "-h" ]; then
     echo "call \"$0 TIME [STEPS]\""
@@ -38,15 +40,19 @@ function isleep() {
   echo -en "0\n"
 }
 
-# cd to dir of file
+# cd to directory of a file
 function cdb() {
   cd "$(dirname $1)"
 }
 
-function cpwd() {
-  pwd >! ~/.wd
-}
+# working directory bookmark (~/.wd)
+function cpwd() { pwd >! ~/.wd }
+function ppwd() { [ -e ~/.wd ] && cd "$(cat ~/.wd)" }
+function epwd() { [ -e ~/.wd ] && cat ~/.wd }
+function cp2wd() { [ -e ~/.wd ] && cp "$@" "$(cat ~/.wd)" }
+function mv2wd() { [ -e ~/.wd ] && mv "$@" "$(cat ~/.wd)" }
 
+# cp/mv with auto-mkdir
 function cpmk() {
   if [ ${#@} -lt 2 ]; then
     echo "not enough arguments. call with"
@@ -59,8 +65,7 @@ function cpmk() {
   for f in ${(s: :)FILES}; do
     cp -v $f "$DIR"
   done
-  unset FILES
-  unset DIR
+  unset FILES DIR
 }
 
 function mvmk() {
@@ -75,22 +80,22 @@ function mvmk() {
   for f in ${(s: :)FILES}; do
     mv -v $f "$DIR"
   done
-  unset FILES
-  unset DIR
+  unset FILES DIR
 }
 
+# unzip into a subdirectory named after the archive
 function unzipd() {
   DIR=$(pwd)
   FILE=$(basename ${1})
   unzip -d ${DIR}/${FILE%.zip} $1
 }
+
+# /etc backup/restore helpers
 function _escape() {
-  # echo $1 | sed 's/^\///;s/^\./dot_/;s/\/\./__dot_/;s/\//__/g'
   echo $1 | sed "s,$HOME,HOME,;s,^\/,,;s,\/\.,__dot_,;s,\/,__,g"
 }
 
 function _unescape() {
-  # echo $1 | sed 's,dot_,'"$HOME/."',;s,^\([a-z]\),\/\1,;s,__,\/,g'
   echo $1 | sed "s,HOME,$HOME,;s,^\([a-z]\),\/\1,;s,__dot_,\/\.,;s,__,\/,g"
 }
 
@@ -105,17 +110,12 @@ function etcbackup() {
       echo "file \"$FILE\" does not exist"
       continue
     fi
-
     TARGETDIR=$HOME/backup/$(hostname)
     mkdir -p $TARGETDIR
     SOURCEFILE=$(readlink -f $FILE)
     TARGETFILE=$(_escape $SOURCEFILE)
-
     cp -iv $FILE $TARGETDIR/$TARGETFILE
-
-    unset TARGETDIR
-    unset FILE
-    unset TARGETFILE
+    unset TARGETDIR FILE TARGETFILE
   done
 }
 
@@ -130,11 +130,9 @@ function etcrestore() {
       echo "file \"$FILE\" does not exist"
       continue
     fi
-
     BASENAME=$(basename $FILE)
     TARGETFILE=$(_unescape $BASENAME)
     TARGETDIR=$(dirname $TARGETFILE)
-
     SUDO=""
     if [[ ! $TARGETFILE = *"${HOME}"* ]]; then
       echo "need root privileges..."
@@ -142,11 +140,7 @@ function etcrestore() {
     fi
     $SUDO mkdir -p $TARGETDIR
     $SUDO cp -iv $FILE $TARGETFILE
-
-    unset FILE
-    unset TARGETDIR
-    unset TARGETFILE
-    unset BASENAME
+    unset FILE TARGETDIR TARGETFILE BASENAME
   done
 }
 
@@ -172,50 +166,22 @@ function lsmnt() {
   unset MDEV MDIR MTYPE IGN
 }
 
-function ppwd() {
-  [ -e ~/.wd ] && cd "$(cat ~/.wd)"
-}
+# date/time helpers
+function now()   { date +%Y${1}%m${1}%d${2:-_}%H${1}%M }
+function nows()  { date +%Y${1}%m${1}%d${2:-_}%H${1}%M${1}%S }
+function today() { date +%Y${1}%m${1}%d }
 
-function epwd() {
-  [ -e ~/.wd ] && cat ~/.wd
-}
-
-function cp2wd() {
-  if [ -e ~/.wd ];
-  then
-    cp "$@" "$(cat ~/.wd)"
-  fi
-}
-
-function mv2wd() {
-  if [ -e ~/.wd ];
-  then
-    mv "$@" "$(cat ~/.wd)"
-  fi
-}
-
-function now() {
-  date +%Y${1}%m${1}%d${2:-_}%H${1}%M
-}
-
-function nows() {
-  date +%Y${1}%m${1}%d${2:-_}%H${1}%M${1}%S
-}
-
-function today() {
-  date +%Y${1}%m${1}%d
-}
-
+# base conversion
 function x2bin() { perl -e "printf(\"0b%b\n\",  $1)" }
 function x2dec() { perl -e "printf(\"%d\n\",    $1)" }
 function x2hex() { perl -e "printf(\"0x%x\n\",  $1)" }
 
+# persistent SSH SOCKS proxy
 function sshproxy() {
   HOST=${1:-ykonni}
   PORT=${2:-8222}
   echo "starting proxy to $HOST on $PORT"
   while true; do
-    # probe if host is up
     ssh $HOST true &> /dev/null
     if [ $? -eq 0 ]; then
       echo connected.
@@ -237,16 +203,14 @@ function printcolors() {
   done
 }
 
+# wait until host becomes reachable/unreachable
 function wping() {
     [ -n "$1" ] || return
-    ARG=${1}
-    TARGET=${ARG#*@}
-    TIMEOUT=2
-    COUNT=0
-    echo "retrying until $TARGET (from $ARG) becomes reachable..."
+    TARGET=${1#*@}
+    TIMEOUT=2 COUNT=0
+    echo "retrying until $TARGET becomes reachable..."
     timeout $TIMEOUT ping -c 1 $TARGET &> /dev/null
     while [ ! $? -eq 0 ]; do
-        # echo -en "."
         let COUNT=COUNT+1
         sleep 1
         timeout $TIMEOUT ping -c 1 $TARGET &> /dev/null
@@ -256,14 +220,11 @@ function wping() {
 
 function wnping() {
     [ -n "$1" ] || return
-    ARG=${1}
-    TARGET=${ARG#*@}
-    TIMEOUT=2
-    COUNT=0
-    echo "retrying until $TARGET (from $ARG) becomes unreachable..."
+    TARGET=${1#*@}
+    TIMEOUT=2 COUNT=0
+    echo "retrying until $TARGET becomes unreachable..."
     timeout $TIMEOUT ping -c 1 $TARGET &> /dev/null
     while [ ! $? -ne 0 ]; do
-        # echo -en "."
         let COUNT=COUNT+1
         sleep 1
         timeout $TIMEOUT ping -c 1 $TARGET &> /dev/null
