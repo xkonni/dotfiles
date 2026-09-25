@@ -94,6 +94,15 @@ function _cw_workspace_file() {
     echo "$abs"
     return 0
   fi
+  local last="${XDG_STATE_HOME:-$HOME/.local/state}/cw/last-workspace"
+  if [[ -f "$last" ]]; then
+    local saved=$(<"$last")
+    if [[ -f "$saved" ]]; then
+      export CODE_WORKSPACE="$saved"
+      echo "$saved"
+      return 0
+    fi
+  fi
   return 1
 }
 
@@ -141,6 +150,8 @@ function cw() {
         export CODE_WORKSPACE="$candidate"
       fi
       echo "activated: $CODE_WORKSPACE"
+      local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/cw"
+      mkdir -p "$state_dir" && echo "$CODE_WORKSPACE" > "$state_dir/last-workspace"
       ;;
 
     ls)
