@@ -136,6 +136,7 @@
     # remote
     r = remote -v                     # show remotes (verbose)
     ru = remote update                # update remotes
+    rem = "!f() { r=$(git remote | grep -x upstream || git remote | grep -x origin || git remote | head -1); b=$(git symbolic-ref refs/remotes/$r/HEAD 2>/dev/null | awk -F/ '{print $NF}'); [ -z \"$b\" ] && { git show-ref -q --verify refs/remotes/$r/main && b=main || b=master; }; git remote update && git rebase $r/$b; }; f"
 
     # reset
     unstage = reset HEAD              # remove files from index (tracking)
