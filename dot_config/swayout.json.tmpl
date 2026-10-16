@@ -49,7 +49,10 @@
             "name": "extern-49",
             "main": "extern-49",
             "outputs": [
+{{- if eq .chezmoi.hostname "silence" -}}
                 { "name": "intern", "active": false },
+{{- end }}
+                { "name": "extern-27", "active": false },
                 {
                     "name": "extern-49",
                     "active": true,
