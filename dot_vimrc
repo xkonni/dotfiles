@@ -17,7 +17,7 @@ set listchars=tab:▸\ ,trail:·,extends:→,precedes:←,nbsp:␣
 set ignorecase
 set smartcase
 set colorcolumn=120
-set tw=100
+set tw=120
 set cursorline
 set number
 set relativenumber
