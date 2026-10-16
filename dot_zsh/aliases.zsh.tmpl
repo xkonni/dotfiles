@@ -20,6 +20,18 @@ function pprint() {
     print
 }
 
+function _escape() {
+    echo $1 | sed "s,$HOME,HOME,;s,^\/,,;s,\/\.,__dot_,;s,\/,--,g;s, ,__,g"
+}
+
+function _unescape() {
+    echo $1 | sed "s,HOME,$HOME,;s,^\([a-z]\),\/\1,;s,__dot_,\/\.,;s,--,\/,g;s,__, ,g"
+}
+
+function _pretty() {
+    echo $1 | sed "s, ,_,g"
+}
+
 # ohmyzsh
 alias omr='omz reload'
 alias omu='omz update'

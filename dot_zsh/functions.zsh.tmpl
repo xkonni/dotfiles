@@ -84,6 +84,46 @@ function mvmk() {
 }
 
 # unzip into a subdirectory named after the archive
+function extract() {
+  local mkdir=0
+  local list=(7z rar tgz zip)
+  [[ "$1" == -d ]] && { mkdir=1; shift }
+  local full="$1"
+  if [[ ! -e "$full" ]]; then
+    echo "ERROR input file \"$full\" does not exist"
+    return 1
+  fi
+  local ext="$1:t:e"
+  local name="$(_pretty $full:t:r)"
+
+  if [[ ! ${list[(r)$ext]} == $ext ]]; then
+    echo "ERROR unknown extension \"$ext\" for \"$full\""
+    return 1
+  fi
+
+  if (( mkdir )); then
+    mkdir -p "$name"
+    cd "$name"
+  fi
+  case $ext in
+      7z)
+        7z x "${full}"
+        ;;
+      rar)
+        unrar x "${full}"
+        ;;
+      tgz)
+        tar xvfz "${full}"
+        ;;
+      zip)
+        unzip "${full}"
+        ;;
+      *)
+        echo "should not show"
+        return 1
+  esac
+}
+
 function unzipd() {
   DIR=$(pwd)
   FILE=$(basename ${1})
@@ -91,14 +131,6 @@ function unzipd() {
 }
 
 # /etc backup/restore helpers
-function _escape() {
-  echo $1 | sed "s,$HOME,HOME,;s,^\/,,;s,\/\.,__dot_,;s,\/,__,g"
-}
-
-function _unescape() {
-  echo $1 | sed "s,HOME,$HOME,;s,^\([a-z]\),\/\1,;s,__dot_,\/\.,;s,__,\/,g"
-}
-
 function etcbackup() {
   FILES=$*
   if [ -z "$FILES" ]; then
