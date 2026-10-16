@@ -8,9 +8,23 @@ alias kn="u8s set --namespace"
 alias kc="u8s set --context"
 alias kkc="u8s set --kubeconfig"
 
-h() { u8s helm "$@" }
+_u8s_helm() {
+  local cmd=$1; shift
+  local kc ctx ns
+  while IFS='=' read -r k v; do
+    case $k in
+      U8S_KUBECONFIG) kc="$v" ;;
+      U8S_CONTEXT)    ctx="$v" ;;
+      U8S_NAMESPACE)  ns="$v" ;;
+    esac
+  done < <(u8s env)
+  local -a ns_flag=()
+  [[ -n $ns ]] && ns_flag=(--namespace "$ns")
+  KUBECONFIG="$kc" "$cmd" --kube-context "$ctx" "${ns_flag[@]}" "$@"
+}
+h() { _u8s_helm helm "$@" }
 compdef h=helm
-h3() { u8s helm3 "$@" }
+h3() { _u8s_helm helm3 "$@" }
 compdef h3=helm
 
 {{ else if eq .chezmoi.os "linux" }}
@@ -38,6 +52,7 @@ alias kgp='k get pods -o wide'
 alias kgpa='k get pods -o wide --all-namespaces'
 alias kgn='k get nodes -L container-linux-update.v1.coreos.com/version -L failure-domain.beta.kubernetes.io/zone'
 alias kds='k describe service'
+alias kge='k get events --sort-by=.lastTimestamp'
 
 alias -g OY="-o yaml"
 alias -g OYL="-o yaml | bat -l yaml"
@@ -117,6 +132,7 @@ function _eval-metal() {
     read bns bpod _ <<<$(echo "$pods" | _pick-pod 'boot-operator-controller-manager')
     read dns dpod _ <<<$(echo "$pods" | _pick-pod 'metal-operator-dnsmasq')
     read ans apod _ <<<$(echo "$pods" | _pick-pod -e 'argora-remote-controller-manager' -e 'argora-controller-manager')
+    read mdns mdpod _ <<<$(echo "$pods" | _pick-pod 'metaldhcp-')
     pprint bold:magenta ">> metal-operator (mo)"
     pprint green ">" none "ns=$mons" green "\n>" none "pod=$mopod"
     pprint bold:magenta ">> metal-maintenance-operator (mmo)"
@@ -127,7 +143,9 @@ function _eval-metal() {
     pprint green ">" none "ns=$dns" green "\n>" none "pod=$dpod"
     pprint bold:magenta ">> argora-remote (a)"
     pprint green ">" none "ns=$ans" green "\n>" none "pod=$apod"
-    export mons mopod mmons mmopod bns bpod dns dpod ans apod
+    pprint bold:magenta ">> metaldhcp (md)"
+    pprint green ">" none "ns=$mdns" green "\n>" none "pod=$mdpod"
+    export mons mopod mmons mmopod bns bpod dns dpod ans apod mdns mdpod
 }
 
 function _pod-ns() {
@@ -137,6 +155,7 @@ function _pod-ns() {
         b)   echo "$bns $bpod" ;;
         d)   echo "$dns $dpod" ;;
         a)   echo "$ans $apod" ;;
+        md)  echo "$mdns $mdpod" ;;
         *) echo "Unknown component: $1" >&2; return 1 ;;
     esac
 }
@@ -145,36 +164,42 @@ function _env-check() {
     case $1 in
         mo)
             if [ -z "$mons" ] || [ -z "$mopod" ]; then
-                echo "no metal-operator env found, run eval-metal first." >&2
+                echo "no metal-operator env found, run kk eval first." >&2
                 return 1
             fi
             ;;
         mmo)
             if [ -z "$mmons" ] || [ -z "$mmopod" ]; then
-                echo "no metal-maintenance-operator env found, run eval-metal first." >&2
+                echo "no metal-maintenance-operator env found, run kk eval first." >&2
                 return 1
             fi
             ;;
         b)
             if [ -z "$bns" ] || [ -z "$bpod" ]; then
-                echo "no boot-operator env found, run eval-metal first." >&2
+                echo "no boot-operator env found, run kk eval first." >&2
                 return 1
             fi
             ;;
         d)
             if [ -z "$dns" ] || [ -z "$dpod" ]; then
-                echo "no dnsmasq env found, run eval-metal first." >&2
+                echo "no dnsmasq env found, run kk eval first." >&2
                 return 1
             fi
             ;;
         a)
             if [ -z "$ans" ] || [ -z "$apod" ]; then
-                echo "no argora-remote env found, run eval-metal first." >&2
+                echo "no argora-remote env found, run kk eval first." >&2
+                return 1
+            fi
+            ;;
+        md)
+            if [ -z "$mdns" ] || [ -z "$mdpod" ]; then
+                echo "no metaldhcp env found, run kk eval first." >&2
                 return 1
             fi
             ;;
         *)
-            echo "Unknown component: $1, expected mo, mmo, b, d, a." >&2
+            echo "Unknown component: $1, expected mo, mmo, b, d, a, md." >&2
             return 1
             ;;
     esac
@@ -221,14 +246,51 @@ function kk() {
     if [[ $# -lt 1 ]]; then
         echo "Usage: $0 <eval|leases|logs|describe|bmcsecret|secret|ssh|curl|ping|kc> [args...]" >&2; return 1
     fi
+    # strip global flags before dispatch
+    local simulate=0 kk_node= kk_region= auto_eval=0
+    local -a _kk_args=()
+    local _past_dd=0 _i=1
+    while (( _i <= $# )); do
+        local _a="${@[$_i]}"
+        if (( _past_dd )); then
+            _kk_args+=("$_a")
+        elif [[ $_a == -- ]]; then
+            _past_dd=1; _kk_args+=("$_a")
+        elif [[ $_a == -ss ]]; then
+            simulate=2
+        elif [[ $_a == -s ]]; then
+            simulate=1
+        elif [[ $_a == -e ]]; then
+            auto_eval=1
+        elif [[ $_a == -n ]]; then
+            (( _i++ )); kk_node="${@[$_i]}"
+        elif [[ $_a == -r ]]; then
+            (( _i++ )); kk_region="${@[$_i]}"
+        else
+            _kk_args+=("$_a")
+        fi
+        (( _i++ ))
+    done
+    set -- "${_kk_args[@]}"
     local action=$1; shift
+    (( auto_eval )) && { _eval-metal || return 1 }
     case $action in
         logs)
             local -a flags
-            while [[ $1 == -* ]]; do flags+=($1); shift; done
+            while [[ $1 == -* ]]; do
+                case $1 in
+                    -c|--container) flags+=($1 $2); shift 2 ;;
+                    *) flags+=($1); shift ;;
+                esac
+            done
             _env-check $1 || return 1
             local comp=$1; shift
             local pod_ns=$(_pod-ns $comp) || return 1
+            if (( simulate )); then
+                local ns=${pod_ns% *} pod=${pod_ns#* }
+                echo "k logs ${flags[@]} -n $ns $pod $@"
+                return 0
+            fi
             _kube-logs ${=pod_ns} "${flags[@]}" "$@"
             ;;
         describe)
@@ -241,12 +303,12 @@ function kk() {
             local do_ping=0 filter= mapfile=
             while [[ $1 == -* ]]; do
                 case $1 in
-                    -p) do_ping=1; shift ;;
+                    -P) do_ping=1; shift ;;
                     -l) filter=$2; shift 2 ;;
                     -m) mapfile=$2; shift 2 ;;
                     -h|--help)
-                        echo "Usage: $0 leases [-p] [-l <filter>] [-m <mapfile>]"
-                        echo "  -p            ping each IP to check reachability"
+                        echo "Usage: $0 leases [-P] [-l <filter>] [-m <mapfile>]"
+                        echo "  -P            ping each IP to check reachability"
                         echo "  -l <filter>   grep leases by filter string"
                         echo "  -m <mapfile>  MAC-to-name map file (one 'mac name' per line, # comments ok)"
                         return 0 ;;
@@ -272,6 +334,7 @@ function kk() {
                 mac_ips[${mac:l}]+="$ip "
                 [[ "$hostname" != "*" && "$hostname" != "" ]] && ip_host[$ip]="$hostname"
             done <<< "$raw"
+            local last_ping_rc=0
             for mac in ${(ko)mac_ips}; do
                 echo "- $mac"
                 for ip in ${=mac_ips[$mac]}; do
@@ -281,18 +344,19 @@ function kk() {
                     [[ -n ${mac_name[$mac]} ]] && names+=("${mac_name[$mac]}")
                     (( ${#names} )) && label+=" (${(j: · :)names})"
                     if (( do_ping )); then
-                        timeout 0.5 ping -c 1 $ip &>/dev/null && echo "  - $label · YES" || echo "  - $label · no"
+                        timeout 0.5 ping -c 1 $ip &>/dev/null && echo "  - $label · YES" || { echo "  - $label · no"; last_ping_rc=1 }
                     else
                         echo "  - $label"
                     fi
                 done
             done
+            (( do_ping )) && return $last_ping_rc
             ;;
         secret)
             if [[ $# -lt 1 ]]; then
-                echo "Usage: $0 secret [-r] <secret> [namespace]" >&2; return 1
+                echo "Usage: $0 secret [-R] <secret> [namespace]" >&2; return 1
             fi
-            local raw=0; [[ $1 == -r ]] && { raw=1; shift }
+            local raw=0; [[ $1 == -R ]] && { raw=1; shift }
             local secret=$1 ns=$2
             local json ns_flag=()
             [[ -n $ns ]] && ns_flag=(-n "$ns")
@@ -305,9 +369,9 @@ function kk() {
             ;;
         bmcsecret)
             if [[ $# -lt 1 ]]; then
-                echo "Usage: $0 bmcsecret [-r] <name>" >&2; return 1
+                echo "Usage: $0 bmcsecret [-R] <name>" >&2; return 1
             fi
-            local raw=0; [[ $1 == -r ]] && { raw=1; shift }
+            local raw=0; [[ $1 == -R ]] && { raw=1; shift }
             local name=$1
             local json
             json=$(k get bmcsecrets.metal.ironcore.dev "$name" -o json 2>/dev/null)
@@ -315,12 +379,14 @@ function kk() {
             _print-secret $raw <<< "$json"
             ;;
         ssh)
-            if [[ $# -lt 1 ]]; then
+            local node=${1:-$kk_node}
+            if [[ -z $node ]]; then
                 echo "Usage: $0 ssh <node> [user] [namespace]" >&2; return 1
             fi
-            local node=$1
+            [[ -n $1 ]] && shift
             [[ "$node" != *-system-* ]] && node="${node}-system-0"
-            local user=${2:-metal} ns=$3
+            local user=${1:-metal} ns=$2
+            [[ -n $1 ]] && shift 2 || true
             mkdir -p /tmp/ssh-keys && chmod 700 /tmp/ssh-keys
             local key value secret_user= secret_pass= has_key=0
             while IFS=$'\t' read -r key value; do
@@ -331,7 +397,7 @@ function kk() {
                     password) secret_pass=$(base64 -d <<< "$value"); echo "password: $secret_pass" ;;
                     *)        echo "$key: $value" ;;
                 esac
-            done < <($0 secret -r "${node}-ssh" "$ns")
+            done < <($0 secret -R "${node}-ssh" "$ns")
             [[ -n $secret_user ]] && user=$secret_user
             if (( has_key )); then
                 alias ssh-$node="ssh -l $user -i /tmp/ssh-keys/id_${node} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
@@ -342,27 +408,34 @@ function kk() {
             ;;
         curl)
             setopt localoptions nobanghist
-            local pipe=cat node= region= url_path= verbose=0 plain=0
+            local pipe=cat node=$kk_node region=$kk_region url_base= plain=0
             local -a curl_args=()
             while [[ $# -gt 0 ]]; do
                 case $1 in
                     -j)  pipe=jq; shift ;;
                     -y)  pipe=yq; shift ;;
-                    -n)  node=$2; shift 2 ;;
-                    -r)  region=$2; shift 2 ;;
-                    -u)  url_path=$2; shift 2 ;;
-                    -v)  verbose=1; shift ;;
-                    -vv) verbose=2; shift ;;
+                    -u)  url_base=$2; shift 2 ;;
                     -p)  plain=1; shift ;;
                     --)  shift; break ;;
                     *)   break ;;
                 esac
             done
             curl_args=("$@")
-            if [[ -n $url_path ]]; then
-                [[ -z $node ]] && { echo "kk curl: -u <path> requires -n <node>" >&2; return 1 }
-                local built_url; built_url=$(_kk_node_url "$node" "$region" "$url_path") || return 1
-                curl_args=("$built_url" "${curl_args[@]}")
+            # extract leading /path arg if present
+            local url_path=
+            if [[ ${curl_args[1]} == /* ]]; then
+                url_path=${curl_args[1]}
+                curl_args=("${curl_args[@]:1}")
+            fi
+            if [[ -n $url_base || -n $url_path ]]; then
+                [[ -z $node ]] && { echo "kk curl: -n <node> required for URL assembly" >&2; return 1 }
+                if [[ -n $url_base ]]; then
+                    [[ $url_base != https://* ]] && url_base="https://$url_base"
+                    curl_args=("$url_base$url_path" -k "${curl_args[@]}")
+                else
+                    local built_url; built_url=$(_kk_node_url "$node" "$region" "$url_path") || return 1
+                    curl_args=("$built_url" "${curl_args[@]}")
+                fi
             fi
             if [[ -z $node ]]; then
                 for arg in "${curl_args[@]}"; do
@@ -373,7 +446,7 @@ function kk() {
                 done
             fi
             if [[ -z $node ]]; then
-                echo "Usage: $0 curl [-j|-y] [-n node] [-r region] [-u path] [-p] [-v|-vv] [-- curl args...]" >&2; return 1
+                echo "Usage: $0 curl [-j|-y] [-n node] [-r region] [-u base-ip] [-p] [/path] [-- curl args...]" >&2; return 1
             fi
             local user pass
             while IFS=$'\t' read -r key val; do
@@ -384,13 +457,13 @@ function kk() {
             done < <($0 bmcsecret "$node")
             [[ -z $user || -z $pass ]] && { echo "Error: could not extract credentials from bmcsecret \"$node\"" >&2; return 1 }
             local auth=$(printf '%s:%s' "$user" "$pass" | base64 | tr -d '\n')
-            if (( verbose )); then
+            if (( simulate )); then
                 if (( plain )); then
-                    (( verbose >= 2 )) \
+                    (( simulate >= 2 )) \
                         && echo "curl -u $user:$pass ${curl_args[@]}" \
                         || echo "curl -u $user:**** ${curl_args[@]}"
                 else
-                    (( verbose >= 2 )) \
+                    (( simulate >= 2 )) \
                         && echo "curl -H 'Authorization: Basic $auth' ${curl_args[@]}" \
                         || echo "curl -H 'Authorization: Basic <redacted>' ${curl_args[@]}"
                 fi
@@ -420,43 +493,112 @@ function kk() {
                 ctx="${lines[2]:-${lines[1]}}"
                 [[ -z $ctx ]] && return 0
             fi
-            u8s set --context "$ctx" || return 1
-            grep -qxF "$ctx" "$state_file" 2>/dev/null || echo "$ctx" >> "$state_file"
-            if (( auto_eval )); then
-                echo >/dev/tty
-                _eval-metal
+            if [[ $ctx == m-* ]]; then
+                u8s set --context "$ctx" --namespace metal-servers || return 1
+            elif [[ $ctx == g-* ]]; then
+                u8s set --context "$ctx" --namespace garden-compute || return 1
             else
-                print -Pn "%B%F{214}run eval? [Y/n]%f%b " >/dev/tty
-                local ans; read -k1 ans </dev/tty; echo >/dev/tty
-                [[ $ans == [Yy$'\n'] ]] && { echo >/dev/tty; _eval-metal }
+                u8s set --context "$ctx" || return 1
+            fi
+            local tmp; tmp=$(mktemp)
+            { echo "$ctx"; grep -vxF "$ctx" "$state_file" 2>/dev/null; } > "$tmp" && mv "$tmp" "$state_file"
+            if [[ $ctx == (a|rt)-* ]]; then
+                if (( auto_eval )); then
+                    echo >/dev/tty
+                    _eval-metal
+                else
+                    print -Pn "%B%F{214}run eval? [Y/n]%f%b " >/dev/tty
+                    local ans; read -k1 ans </dev/tty; echo >/dev/tty
+                    [[ $ans == [Yy$'\n'] ]] && { echo >/dev/tty; _eval-metal }
+                fi
             fi
             ;;
         eval)
             _eval-metal
             ;;
-        bmc)
-            local node= region=
-            while [[ $# -gt 0 ]]; do
+        fdel)
+            local force=0 del_maint=0
+            while [[ $1 == -* ]]; do
                 case $1 in
-                    -n) node=$2; shift 2 ;;
-                    -r) region=$2; shift 2 ;;
-                    *)  break ;;
+                    -f) force=1; shift ;;
+                    -m) del_maint=1; shift ;;
+                    *) break ;;
                 esac
             done
-            [[ -z $node ]] && { echo "Usage: $0 bmc -n <node> [-r region]" >&2; return 1 }
-            _kk_node_url "$node" "$region"
+            if [[ $# -lt 2 ]]; then
+                echo "Usage: $0 fdel [-f] [-m] <resource-type> <filter>  (-f: no confirmation  -m: also delete servermaintenance)" >&2; return 1
+            fi
+            local resource=$1 filter=$2
+            local -a names
+            names=($(k get "$resource" 2>/dev/null | grep -i "$filter" | awk '{print $1}'))
+            if [[ ${#names} -eq 0 ]]; then
+                echo "no $resource resources matching '$filter'" >&2; return 0
+            fi
+            local ans maint_name maint_ns
+            for name in "${names[@]}"; do
+                if (( ! force )); then
+                    print -Pn "%B%F{214}patch+delete $resource/$name? [Y/n]%f%b " >/dev/tty
+                    read -r ans </dev/tty
+                    [[ ${ans:l} == y* || -z $ans ]] || continue
+                fi
+                if (( del_maint )); then
+                    maint_name=$(k get "$resource" "$name" -o jsonpath='{.spec.serverMaintenanceRef.name}' 2>/dev/null)
+                    maint_ns=$(k get "$resource" "$name" -o jsonpath='{.spec.serverMaintenanceRef.namespace}' 2>/dev/null)
+                    [[ -n $maint_name ]] && k delete servermaintenance -n "${maint_ns:-metal-servers}" "$maint_name" 2>/dev/null || true
+                fi
+                k patch "$resource" "$name" --subresource=status --type merge -p '{"status": {"state": "Failed"}}'
+                k patch "$resource" "$name" --type=json -p='[{"op":"remove","path":"/metadata/finalizers"}]'
+                k delete "$resource" "$name"
+            done
+            ;;
+        bmc)
+            local node=${1:-$kk_node}
+            [[ -z $node ]] && { echo "Usage: $0 bmc <node>" >&2; return 1 }
+            _kk_node_url "$node" "$kk_region"
             ;;
         ping)
-            if [[ $# -lt 1 ]]; then
+            if [[ $# -lt 1 && -z $kk_node ]]; then
                 echo "Usage: $0 ping <node> [node...]" >&2; return 1
             fi
-            for node in "$@"; do
+            local -a _ping_nodes=("$@")
+            (( ${#_ping_nodes} == 0 )) && _ping_nodes=("$kk_node")
+            for node in "${_ping_nodes[@]}"; do
                 local fqdn; fqdn=$(_kk_node_fqdn "$node") || return 1
                 _ping-host "$fqdn"
             done
             ;;
+        help|--help|-h)
+            cat <<'EOF'
+kk — metal operator helper
+
+Global flags (apply to any subcommand):
+  -n <node>       node name (used by curl, bmc, ssh, ping)
+  -r <region>     region (used by curl, bmc)
+  -e              run eval before subcommand (loads component env)
+  -s              simulate: print command without running
+  -ss             simulate with full credentials exposed
+
+Subcommands:
+  eval                        run eval-metal (load metal operator env)
+  kc [-e] [ctx]               set kube context; -e auto-runs eval after switch
+  logs [-c container] <comp>  stream logs for component (mo|mmo|b|d|a|md)
+  describe <comp>             kubectl describe pod for component (mo|mmo|b|d|a|md)
+  leases [-P] [-l filter] [-m mapfile]
+                              show dnsmasq leases; -P pings each IP
+  secret [-R] <name> [ns]     show secret values; -R raw (base64)
+  bmcsecret [-R] <name>       show BMC secret values; -R raw
+  ssh <node> [user] [ns]      set up ssh alias for node
+  curl [-j|-y] [-u base] [-p] [/path] [-- curl-args...]
+                              curl BMC endpoint; -j jq, -y yq, -p plain auth
+  bmc [node]                  print BMC URL for node
+  ping [node...]              ping node(s) by FQDN
+  fdel [-f] [-m] <resource> <filter>
+                              force-delete resources (patch finalizers + delete)
+                              -f skip confirmation  -m also delete servermaintenance
+EOF
+            ;;
         *)
-            echo "Usage: $0 <eval|leases|logs|describe|bmcsecret|secret|ssh|curl|bmc|ping|kc> [args...]" >&2; return 1
+            echo "Usage: $0 <eval|leases|logs|describe|bmcsecret|secret|ssh|curl|bmc|ping|kc|fdel> [args...]  (kk help for details)" >&2; return 1
             ;;
     esac
 }
