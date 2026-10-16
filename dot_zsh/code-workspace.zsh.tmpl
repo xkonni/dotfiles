@@ -111,8 +111,10 @@ function _cw_parse_folders() {
   # returns lines of "name\tpath" with path resolved relative to workspace dir
   local wsdir="${ws:h}"
   python3 -c "
-import json, os, sys
-ws = json.load(open('$ws'))
+import json, os, re
+src = open('$ws').read()
+src = re.sub(r',(\s*[}\]])', r'\1', src)
+ws = json.loads(src)
 wsdir = '$wsdir'
 for f in ws.get('folders', []):
     p = os.path.normpath(os.path.join(wsdir, f['path']))

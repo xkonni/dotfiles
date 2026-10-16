@@ -32,7 +32,21 @@ alias cmd='chezmoi diff'
 alias cme='chezmoi edit'
 alias cmce='EDITOR=code chezmoi edit'
 alias cmu='chezmoi update'
-function cmr() { chezmoi apply "$1" && source "$1" }
+function cmr() {
+    if [[ -d $1 ]]; then
+        chezmoi apply "$1" || return 1
+        for f in "$1"/*.zsh(N); do
+            echo "sourcing $f"
+            source "$f"
+        done
+    elif [[ $1 == *.zsh ]]; then
+        chezmoi apply "$1" || return 1
+        echo "sourcing $1"
+        source "$1"
+    else
+        echo "cmr: $1 is not a .zsh file or directory" >&2; return 1
+    fi
+}
 
 # git
 alias gl='git log --graph --date=short -n 10'
