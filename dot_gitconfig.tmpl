@@ -162,6 +162,7 @@
 
     # tag
     t = tag -n                        # show tags with <n> lines of each tag message
+    sha = rev-parse --short HEAD      # print last commit SHA
 
     # whatchanged
     w  = log --raw --no-merges -n 10
@@ -228,6 +229,9 @@
 
 [pull]
     rebase = true
+
+[commit]
+    verbose = true
 
 [init]
     defaultBranch = main

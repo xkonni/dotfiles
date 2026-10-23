@@ -3,3 +3,6 @@
 hash -d d=~/Downloads
 hash -d w=~/workspace
 hash -d r=~/workspace/repos
+{{- if eq .chezmoi.os "darwin" }}
+hash -d m=~/workspace/metal-api
+{{- end }}
