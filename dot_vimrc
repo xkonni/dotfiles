@@ -45,14 +45,6 @@ source ~/.vim/settings/functions.vim
 " keymap
 source ~/.vim/settings/keymap.vim
 " plugin settings
-source ~/.vim/settings/ctrlp.vim
 source ~/.vim/settings/fzf.vim
 source ~/.vim/settings/indentLine.vim
-source ~/.vim/settings/deoplete.vim
 source ~/.vim/settings/vim-tmux-navigator.vim
-source ~/.vim/settings/vim-session.vim
-source ~/.vim/settings/neosnippet.vim
-source ~/.vim/settings/vimtex.vim
-source ~/.vim/settings/graphviz.vim
-source ~/.vim/settings/yankring.vim
-source ~/.vim/settings/robot.vim
