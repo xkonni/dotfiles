@@ -10,17 +10,17 @@
         },
 {{- end }}
         {
-            "name": "extern-27",
-            "serial": "FLKQ1L3",
+            "name": "asus-49",
+            "serial": "R9LMAS003894",
             "options": {
-                "mode": "2560x1440",
+                "mode": "5120x1440",
                 "position": "0 0",
                 "transform": "0"
             }
         },
         {
-            "name": "extern-49",
-            "serial": "R9LMAS003894",
+            "name": "philips-49",
+            "serial": "AU42615000011",
             "options": {
                 "mode": "5120x1440@144Hz",
                 "position": "0 0"
@@ -40,18 +40,19 @@
                       "position": "0 0"
                     }
                 },
-                { "name": "extern-27", "active": false },
-                { "name": "extern-49", "active": false }
+                { "name": "asus-49", "active": false },
+                { "name": "philips-49", "active": false }
             ]
         },
 {{- end }}
         {
-            "name": "extern-49",
-            "main": "extern-49",
+            "name": "philips-49",
+            "main": "philips-49",
             "outputs": [
                 { "name": "intern", "active": false },
+                { "name": "asus-49", "active": false },
                 {
-                    "name": "extern-49",
+                    "name": "philips-49",
                     "active": true,
                     "options": {
                       "position": "0 0"
@@ -61,8 +62,8 @@
         },
 {{- if eq .chezmoi.hostname "silence" -}}
         {
-            "name": "intern & extern-49",
-            "main": "extern-49",
+            "name": "intern & philips-49",
+            "main": "philips-49",
             "outputs": [
                 { "name": "intern",
                     "active": true,
@@ -71,44 +72,18 @@
                     }
                 },
                 {
-                    "name": "extern-49",
+                    "name": "philips-49",
                     "active": true,
                     "options": {
                       "position": "0 0"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "intern & extern-27 & extern-49",
-            "main": "extern-49",
-            "outputs": [
-                { "name": "intern",
-                    "active": true,
-                    "options": {
-                      "position": "4160 1440"
-                    }
-                },
-                {
-                    "name": "extern-27",
-                    "active": true,
-                    "options": {
-                      "position": "0 0"
-                    }
-                },
-                {
-                    "name": "extern-49",
-                    "active": true,
-                    "options": {
-                      "position": "0 1440"
                     }
                 }
             ]
         },
 {{- end }}
         {
-            "name": "extern-27 & [m] extern-49",
-            "main": "extern-49",
+            "name": "asus-49 & [m] philips-49",
+            "main": "philips-49",
             "outputs": [
 {{- if eq .chezmoi.hostname "silence" -}}
                 { "name": "intern",
@@ -116,14 +91,14 @@
                 },
 {{- end }}
                 {
-                    "name": "extern-27",
+                    "name": "asus-49",
                     "active": true,
                     "options": {
                       "position": "0 0"
                     }
                 },
                 {
-                    "name": "extern-49",
+                    "name": "philips-49",
                     "active": true,
                     "options": {
                       "position": "0 1440"
@@ -132,8 +107,8 @@
             ]
         },
         {
-            "name": "[m] extern-27 & extern-49",
-            "main": "extern-27",
+            "name": "[m] asus-49 & philips-49",
+            "main": "asus-49",
             "outputs": [
 {{- if eq .chezmoi.hostname "silence" -}}
                 { "name": "intern",
@@ -141,14 +116,14 @@
                 },
 {{- end }}
                 {
-                    "name": "extern-27",
+                    "name": "asus-49",
                     "active": true,
                     "options": {
                       "position": "0 0"
                     }
                 },
                 {
-                    "name": "extern-49",
+                    "name": "philips-49",
                     "active": true,
                     "options": {
                       "position": "0 1440"

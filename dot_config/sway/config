@@ -165,12 +165,12 @@ bindsym $alt+e layout toggle split
 bindsym $alt+shift+f fullscreen
 
 # Toggle the current focus between tiling and floating mode
-bindsym $alt+Shift+space floating toggle
+bindsym $alt+Shift+t floating toggle
 # Toggle border/titlebar
 bindsym $alt+Control+b border toggle
 
 # Swap focus between the tiling area and the floating area
-bindsym $alt+space focus mode_toggle
+bindsym $alt+t focus mode_toggle
 
 # Move focus to the parent container
 bindsym $alt+i focus parent
@@ -273,14 +273,6 @@ bindsym $alt+Control+Shift+period exec swaync-client --close-all
 #
 # Modes
 #
-mode "mouse" {
-    bindsym $alt+s exec wl-kbptr -o modes=split,bisect,click
-    bindsym $alt+b exec wl-kbptr -o modes=bisect,click
-    bindsym $alt+t exec wl-kbptr -o modes=tile
-
-    bindsym Return exec $notify_cmd "mode: default"; mode "default"
-    bindsym Escape exec $notify_cmd "mode: default"; mode "default"
-}
 mode "move" {
     bindsym $left move left 25px
     bindsym $down move down 25px
