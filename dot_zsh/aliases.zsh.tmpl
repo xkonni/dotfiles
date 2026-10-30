@@ -68,7 +68,11 @@ alias cmd='chezmoi diff'
 alias cme='chezmoi edit'
 alias cmce='EDITOR=code chezmoi edit'
 alias cmu='chezmoi update'
-alias cmz='cmr ~/.zsh/aliases.zsh && cmr ~/.zsh'
+unalias cmz 2>/dev/null
+function cmz() {
+    cmr ~/.zsh/aliases.zsh && cmr ~/.zsh
+    [[ -d ~/.zsh_work ]] && cmwr ~/.zsh_work
+}
 function cmr() {
     if [[ -d $1 ]]; then
         chezmoi apply "$1" || return 1
@@ -82,6 +86,30 @@ function cmr() {
         source "$1"
     else
         echo "cmr: $1 is not a .zsh file or directory" >&2; return 1
+    fi
+}
+
+# chezmoi work
+alias cmw='chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml'
+alias cmwa='chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml apply'
+alias cmwc='chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml cd'
+alias cmwd='chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml diff'
+alias cmwe='chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml edit'
+alias cmwce='EDITOR=code chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml edit'
+alias cmwu='chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml update'
+function cmwr() {
+    if [[ -d $1 ]]; then
+        chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml apply "$1" || return 1
+        for f in "$1"/*.zsh(N); do
+            echo "sourcing $f"
+            source "$f"
+        done
+    elif [[ $1 == *.zsh ]]; then
+        chezmoi --source ~/.dotfiles_work --config ~/.config/chezmoi/chezmoi-work.toml apply "$1" || return 1
+        echo "sourcing $1"
+        source "$1"
+    else
+        echo "cmwr: $1 is not a .zsh file or directory" >&2; return 1
     fi
 }
 
