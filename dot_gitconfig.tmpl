@@ -73,7 +73,9 @@
     recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
 
     # branch
-    b = branch -v                     # branch (verbose)
+    b = for-each-ref --sort=-committerdate refs/heads/ --color=always --format='%(HEAD) %(committerdate:short)  %(color:dim)%(objectname:short)%(color:reset)  %(align:45,left)%(if)%(HEAD)%(then)%(color:bold green)%(else)%(color:green)%(end)%(refname:short)%(color:reset)%(end)  %(contents:subject)'
+    br = for-each-ref --sort=-committerdate refs/remotes/ --color=always --format='  %(committerdate:short)  %(color:dim)%(objectname:short)%(color:reset)  %(align:45,left)%(color:blue)%(refname:short)%(color:reset)%(end)  %(contents:subject)'
+    bv = "!{ git for-each-ref --sort=-committerdate refs/heads/ --color=always --format='%(HEAD) %(committerdate:short)  %(color:dim)%(objectname:short)%(color:reset)  %(align:45,left)%(if)%(HEAD)%(then)%(color:bold green)%(else)%(color:green)%(end)%(refname:short)%(color:reset)%(end)  %(contents:subject)'; git for-each-ref --sort=-committerdate refs/remotes/ --color=always --format='  %(committerdate:short)  %(color:dim)%(objectname:short)%(color:reset)  %(align:45,left)%(color:blue)%(refname:short)%(color:reset)%(end)  %(contents:subject)'; } | sort -r"
 
     # commit
 {{ if or (eq .chezmoi.os "darwin") .devcontainer }}
@@ -169,8 +171,8 @@
     wv = log --raw --no-merges
     wq = log --raw --no-merges -n 1
 
-    # force push to remote branch with the same name
-    rv = !git push origin +$(git rev-parse --abbrev-ref HEAD)
+    # pull-request: force push to new/existing remote branch with the same name
+    pr = !git push origin $(git rev-parse --abbrev-ref HEAD) --force-with-lease
 
 [format]
     pretty = format:\"%C(33)%ad%Creset %C(136)%H%C(70)%d%Creset%n%C(33)Author: %C(162)%an <%ae>%Creset%n%C(33)Commit: %C(162)%cn <%ce>%Creset%n%n    %C(33)%s%Creset%n%n%b\"
