@@ -153,5 +153,12 @@ if [ -d ~/.zsh ]; then
   unset _i
 fi
 
+if [ -d ~/.zsh_work ]; then
+  for _i in ~/.zsh_work/*.zsh; do
+    source $_i
+  done
+  unset _i
+fi
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
