@@ -19,6 +19,42 @@ function pprint() {
     done
     print
 }
+# heading/list helpers: hX = section header, lX = list item at matching indent
+_h1() { pprint cyan    "›› $1" "${@:2}" }
+_h2() { pprint 12      "  ›› $1" "${@:2}" }
+_h3() { pprint magenta "    ›› $1" "${@:2}" }
+_h4() { pprint blue    "      ›› $1" "${@:2}" }
+_l1() { pprint cyan    "- $1" "${@:2}" }
+_l2() { pprint 12      "  - $1" "${@:2}" }
+_l3() { pprint magenta "    - $1" "${@:2}" }
+_l4() { pprint blue    "      - $1" "${@:2}" }
+# error
+_he1() { pprint red "›› $1" "${@:2}" }
+_he2() { pprint red "  ›› $1" "${@:2}" }
+_he3() { pprint red "    ›› $1" "${@:2}" }
+_he4() { pprint red "      ›› $1" "${@:2}" }
+_le1() { pprint red "- $1" "${@:2}" }
+_le2() { pprint red "  - $1" "${@:2}" }
+_le3() { pprint red "    - $1" "${@:2}" }
+_le4() { pprint red "      - $1" "${@:2}" }
+# warning
+_hw1() { pprint yellow "›› $1" "${@:2}" }
+_hw2() { pprint yellow "  ›› $1" "${@:2}" }
+_hw3() { pprint yellow "    ›› $1" "${@:2}" }
+_hw4() { pprint yellow "      ›› $1" "${@:2}" }
+_lw1() { pprint yellow "- $1" "${@:2}" }
+_lw2() { pprint yellow "  - $1" "${@:2}" }
+_lw3() { pprint yellow "    - $1" "${@:2}" }
+_lw4() { pprint yellow "      - $1" "${@:2}" }
+# success
+_hs1() { pprint green "›› $1" "${@:2}" }
+_hs2() { pprint green "  ›› $1" "${@:2}" }
+_hs3() { pprint green "    ›› $1" "${@:2}" }
+_hs4() { pprint green "      ›› $1" "${@:2}" }
+_ls1() { pprint green "- $1" "${@:2}" }
+_ls2() { pprint green "  - $1" "${@:2}" }
+_ls3() { pprint green "    - $1" "${@:2}" }
+_ls4() { pprint green "      - $1" "${@:2}" }
 
 # ohmyzsh
 alias omr='omz reload'
@@ -32,6 +68,7 @@ alias cmd='chezmoi diff'
 alias cme='chezmoi edit'
 alias cmce='EDITOR=code chezmoi edit'
 alias cmu='chezmoi update'
+alias cmz='cmr ~/.zsh/aliases.zsh && cmr ~/.zsh'
 function cmr() {
     if [[ -d $1 ]]; then
         chezmoi apply "$1" || return 1
