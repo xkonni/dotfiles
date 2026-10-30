@@ -84,9 +84,9 @@ function _ssh_set_env() {
 function setupssh() {
   eval $(keychain --quiet --eval)
   ssh_save
-  echo "> ssh-agent running, SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-  echo "> identity list:"
-  ssh-add -l | while read line; do echo "  - $line"; done
+  _h2 "ssh-agent running, SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+  _h2 "identity list:"
+  ssh-add -l | while read line; do _l2 "$line"; done
 }
 
 function rtssh() {

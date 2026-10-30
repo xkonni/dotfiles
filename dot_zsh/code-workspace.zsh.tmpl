@@ -241,7 +241,7 @@ function cw() {
       local first=1
       for i in {1..${#search_names}}; do
         [[ $first -eq 1 ]] && first=0 || echo ""
-        print -P "%B%F{214}── ${search_names[$i]} ──%f%b"
+        _h1 "${search_names[$i]}"
         if [[ -d "${search_dirs[$i]}/.git" ]]; then
           git -C "${search_dirs[$i]}" status
         else
@@ -303,7 +303,7 @@ function cw() {
         output=$(rg --color=always --heading "$pattern" "$@" "${search_dirs[$i]}" 2>/dev/null)
         [[ -z "$output" ]] && continue
         [[ $first -eq 1 ]] && first=0 || echo ""
-        print -P "%B%F{214}── ${search_names[$i]} ──%f%b"
+        _h1 "${search_names[$i]}"
         echo "$output"
       done
       ;;
