@@ -245,8 +245,13 @@ alias -g WL='| wc -l'
 alias jdmesg="journalctl -t kernel -xf"
 # ip
 alias ip='ip --color=auto'
-# fasd
-alias v='fasd -fe vim'
+# editor
+if type -p nvim &>/dev/null; then
+    alias vim=nvim
+    alias v='fd --type f | fzf --preview "bat --color=always {}" | xargs -o nvim'
+else
+    alias v='fd --type f | fzf --preview "bat --color=always {}" | xargs -o vim'
+fi
 
 # CLIPBOARD
 {{ if eq .chezmoi.os "darwin" -}}
