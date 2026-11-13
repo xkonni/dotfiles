@@ -48,3 +48,4 @@ source ~/.vim/settings/keymap.vim
 source ~/.vim/settings/fzf.vim
 source ~/.vim/settings/indentLine.vim
 source ~/.vim/settings/vim-tmux-navigator.vim
+source ~/.vim/settings/yazi.vim

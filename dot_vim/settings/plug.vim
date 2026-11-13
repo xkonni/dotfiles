@@ -12,4 +12,9 @@ Plug 'Yggdroot/indentLine'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 
+if has('nvim')
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'mikavilpas/yazi.nvim'
+endif
+
 call plug#end()
