@@ -15,7 +15,8 @@
             "options": {
                 "mode": "5120x1440",
                 "position": "0 0",
-                "transform": "0"
+                "transform": "0",
+                "hdr": "on"
             }
         },
         {
@@ -23,7 +24,8 @@
             "serial": "AU42615000011",
             "options": {
                 "mode": "5120x1440@144Hz",
-                "position": "0 0"
+                "position": "0 0",
+                "hdr": "on"
             }
         }
     ],
@@ -49,7 +51,9 @@
             "name": "philips-49",
             "main": "philips-49",
             "outputs": [
+{{- if eq .chezmoi.hostname "silence" -}}
                 { "name": "intern", "active": false },
+{{- end }}
                 { "name": "asus-49", "active": false },
                 {
                     "name": "philips-49",
