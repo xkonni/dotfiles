@@ -33,11 +33,11 @@ function ssh_save() {
   if [ -e "$SSH_AUTH_SOCK" ]; then
     _ssh_save_file
     export SSH_AUTH_SOCK
-    _l2 "saved " green "$SSH_AUTH_SOCK"
+    _ssh_show "saved "
   elif [ -e "$SSH_AUTH_SOCK_FILE" ] && [ -e "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
     SSH_AUTH_SOCK=$(cat $SSH_AUTH_SOCK_FILE)
     export SSH_AUTH_SOCK
-    _l2 "loaded" none "$SSH_AUTH_SOCK"
+    _ssh_show "loaded"
   else
     _log "ERROR: no valid SSH_AUTH_SOCK"
     _he1 "ssh: no valid SSH_AUTH_SOCK"
@@ -55,7 +55,7 @@ function ssh_load() {
       SSH_AUTH_SOCK=$sock
       export SSH_AUTH_SOCK
       [ -n "$SSH_CLIENT" ] && _log "loaded SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-      _l2 "loaded" green "$SSH_AUTH_SOCK"
+      _ssh_show "loaded"
       _ssh_set_env
     else
       _log "ERROR: invalid socket: $sock"
@@ -67,13 +67,19 @@ function ssh_load() {
       SSH_AUTH_SOCK=$sock
       export SSH_AUTH_SOCK
       _log "using gpgconf SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-      _l2 "loaded" none "$SSH_AUTH_SOCK (gpgconf)"
+      _ssh_show "gpgconf"
       _ssh_set_env
     else
       _log "ERROR: missing file \"$SSH_AUTH_SOCK_FILE\""
       _he1 "ssh: missing file \"$SSH_AUTH_SOCK_FILE\""
     fi
   fi
+}
+
+function _ssh_show() {
+  local label=${1:-socket}
+  _h1 "$label $SSH_AUTH_SOCK"
+  ssh-add -l 2>/dev/null | while read -r line; do _l1 "$line"; done
 }
 
 function _ssh_set_env() {
@@ -89,9 +95,6 @@ function _ssh_set_env() {
 function setupssh() {
   eval $(keychain --quiet --eval)
   ssh_save
-  _h2 "ssh-agent running, SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-  _h2 "identity list:"
-  ssh-add -l | while read line; do _l2 "$line"; done
 }
 
 function rtssh() {
@@ -111,3 +114,8 @@ function _ssh_save_file() {
 {{ if eq .chezmoi.os "linux" -}}
 export SSH_AUTH_SOCK
 {{- end }}
+
+alias ssa='ssh-add'
+alias ssal='ssh-add -l'
+alias sss='ssh_save'
+alias ssl='ssh_load'
