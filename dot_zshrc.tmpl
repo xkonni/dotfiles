@@ -131,7 +131,9 @@ plugins=(
     vi-mode
 )
 
+(( $+commands[kubectl] )) || hash kubectl=/dev/null
 source $ZSH/oh-my-zsh.sh
+(( $+commands[kubectl] )) || unhash kubectl 2>/dev/null
 
 # User configuration
 paths=(/usr/local/go/bin $HOME/bin $HOME/.local/bin $HOME/go/bin)
