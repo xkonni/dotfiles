@@ -185,6 +185,7 @@ bat=( /usr/bin/bat(N) /usr/bin/batcat(N) /opt/homebrew/bin/bat(N) )
 if type -p ${bat:0:1} &> /dev/null
 then
     BAT_CMD=${bat:0:1}
+    unalias c 2>/dev/null
     c() {
         if [[ $# -eq 1 && $1 == *.md ]] && type -p glow &> /dev/null; then
             glow -p -w ${COLUMNS:-120} "$1"
@@ -196,6 +197,7 @@ then
     export MANPAGER="sh -c \"col -bx | ${BAT_CMD} -p -l man\""
     export MANROFFOPT="-P -c"
     unset PAGER
+    unalias help 2>/dev/null
     help() {
         "$@" --help 2>&1 | ${BAT_CMD} --plain --language=help
     }
