@@ -30,46 +30,51 @@ function _log() {
 
 # Save SSH_AUTH_SOCK to file and set environment
 function ssh_save() {
-  # file exists
-  if [ -e "$SSH_AUTH_SOCK_FILE" ]; then
-    # current env different from file
-    if [ ! "$SSH_AUTH_SOCK" = "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
-      # existing socket in file invalid
-      if [ ! -e "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
-        _ssh_save_file
-      fi
-    fi
-  # file missing
-  else
+  if [ -e "$SSH_AUTH_SOCK" ]; then
     _ssh_save_file
+    export SSH_AUTH_SOCK
+    _l2 "saved " green "$SSH_AUTH_SOCK"
+  elif [ -e "$SSH_AUTH_SOCK_FILE" ] && [ -e "$(cat $SSH_AUTH_SOCK_FILE)" ]; then
+    SSH_AUTH_SOCK=$(cat $SSH_AUTH_SOCK_FILE)
+    export SSH_AUTH_SOCK
+    _l2 "loaded" none "$SSH_AUTH_SOCK"
+  else
+    _log "ERROR: no valid SSH_AUTH_SOCK"
+    _he1 "ssh: no valid SSH_AUTH_SOCK"
+    return 1
   fi
   _ssh_set_env
 }
 
 # Load SSH_AUTH_SOCK from file
 function ssh_load() {
-  if [ -e $SSH_AUTH_SOCK_FILE ]; then
-    SSH_AUTH_SOCK=$(cat $SSH_AUTH_SOCK_FILE)
-    if [ -e "$SSH_AUTH_SOCK" ]; then
+  local sock
+  if [ -e "$SSH_AUTH_SOCK_FILE" ]; then
+    sock=$(cat $SSH_AUTH_SOCK_FILE)
+    if [ -e "$sock" ]; then
+      SSH_AUTH_SOCK=$sock
       export SSH_AUTH_SOCK
-      if [ -n "$SSH_CLIENT" ]; then
-        _log "loaded SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-      fi
+      [ -n "$SSH_CLIENT" ] && _log "loaded SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+      _l2 "loaded" green "$SSH_AUTH_SOCK"
+      _ssh_set_env
     else
-      _log "ERROR: invalid socket: $SSH_AUTH_SOCK"
+      _log "ERROR: invalid socket: $sock"
+      _lw2 "socket" none "invalid: $sock"
     fi
   else
-    agent_ssh_socket=$(gpgconf -L | grep agent-ssh-socket)
-    if [ -n "$agent_ssh_socket" ]; then
-      SSH_AUTH_SOCK=$(echo $agent_ssh_socket | cut -d ":" -f 2)
+    sock=$(gpgconf --list-dirs agent-ssh-socket 2>/dev/null)
+    if [ -n "$sock" ]; then
+      SSH_AUTH_SOCK=$sock
       export SSH_AUTH_SOCK
       _log "using gpgconf SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-      return 0
+      _l2 "loaded" none "$SSH_AUTH_SOCK (gpgconf)"
+      _ssh_set_env
+    else
+      _log "ERROR: missing file \"$SSH_AUTH_SOCK_FILE\""
+      _he1 "ssh: missing file \"$SSH_AUTH_SOCK_FILE\""
     fi
-    _log "ERROR: missing file \"$SSH_AUTH_SOCK_FILE\""
   fi
-  _ssh_set_env
- }
+}
 
 function _ssh_set_env() {
   if [ -n "$SSH_AUTH_SOCK" ]; then
