@@ -428,3 +428,24 @@ scale slider {
     padding-left:4px;
     padding-right:4px;
 }
+
+#zmk-battery {
+    margin-left: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 3px;
+    border-radius: 0 0 .4em .4em;
+    transition: all 0.5s;
+    transition-timing-function: ease;
+    color: @srcery-bright-white;
+    /* the 2px blue line on top */
+    box-shadow: inset 0px 2px 0px 0px @srcery-blue;
+}
+
+#zmk-battery:hover {
+    /* keep the line visible on top of the fill */
+    box-shadow:
+        inset 0px 2px 0px 0px @srcery-blue,
+        inset 0px 35px 0px 0px @srcery-bright-blue;
+    color: @srcery-black;
+}

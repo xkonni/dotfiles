@@ -12,6 +12,9 @@ center:
 - type: music
 
 end:
+- type: label
+  name: zmk-battery
+  label: '#zbb_text'
 - type: notifications
   on_click_right: swaync-client -C
 - type: battery
